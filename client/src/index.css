@@ -293,3 +293,17 @@ body { background: var(--market-bg); color: #1f2937; font-family: Inter, Arial, 
 .pickup-store-card b { color: var(--market-navy); font-size: 11px; }
 .pickup-store-card span, .pickup-store-card small { color: var(--market-muted); font-size: 9px; }
 .field-muted { opacity: .6; }
+
+/* Mobile marketplace navigation */
+.mobile-menu-panel { position: absolute; z-index: 50; top: 100%; left: 0; right: 0; background: #fff; border-top: 1px solid var(--market-border); border-bottom: 1px solid var(--market-border); box-shadow: 0 16px 30px rgba(16,32,52,.16); }
+.mobile-menu-panel .market-container { display: flex; flex-direction: column; padding: 14px 0 18px; }
+.mobile-admin-link { display: flex; align-items: center; gap: 10px; padding: 12px; color: var(--market-navy); background: #fff7f3; border: 1px solid #ffd3c5; }
+.mobile-admin-link > svg:first-child { color: var(--market-orange); }
+.mobile-admin-link > span { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.mobile-admin-link small, .mobile-menu-label { color: var(--market-muted); font-size: 9px; }
+.mobile-admin-link b { font-size: 11px; }
+.mobile-menu-label { margin: 18px 0 6px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.mobile-menu-panel > .market-container > a:not(.mobile-admin-link) { display: flex; align-items: center; justify-content: space-between; padding: 12px 3px; color: var(--market-navy); border-bottom: 1px solid #f0f2f5; font-size: 13px; }
+.market-header { position: relative; z-index: 20; }
+@media (max-width: 980px) { .market-account { display: flex; } }
+@media (max-width: 700px) { .market-account { display: flex; gap: 5px; } .market-account > span { display: flex; } .market-account small { display: none; } .market-account b { font-size: 10px; } .market-account > svg:last-child { display: none; } .market-mobile-menu { flex: 0 0 32px; } .market-actions { gap: 8px; } .market-header { z-index: 30; } }

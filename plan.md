@@ -24,3 +24,6 @@ Troca da serif editorial por uma sans-serif de interface (Inter/Arial fallback),
 
 ## Robustez de demonstração
 A jornada não depende de CEP real, gateway, login ou API externa. O carrinho, catálogo e alterações do painel usam `localStorage`, com validações e estados de erro. Pagamento é sempre identificado como simulado e pode ser aberto pelos botões de método após adicionar um item ao carrinho.
+
+## Responsividade
+Em telas pequenas, o cabeçalho mantém busca, carrinho e acesso à área administrativa no canto superior direito; o botão sanduíche abre um menu funcional com categorias e atalho do lojista. Cards, checkout, painel e controles devem se adaptar sem depender de rolagem horizontal.

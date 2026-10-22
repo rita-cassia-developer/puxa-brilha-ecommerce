@@ -24,3 +24,8 @@
 ## Estabilidade
 - A demonstração não deve depender de login, CEP real, gateway, imagens remotas ou API externa.
 - Deve existir catálogo inicial, validação de campos, fallback visual, estados vazios e mensagens de confirmação.
+
+## Responsividade mobile
+- Em celulares, a loja deve manter o acesso “Área administrativa” visível no canto superior direito, junto do carrinho.
+- O botão de menu sanduíche deve abrir e fechar um menu funcional com categorias e atalho para o painel administrativo.
+- A vitrine e o checkout devem se ajustar a telas pequenas sem cortar controles essenciais ou exigir rolagem horizontal.
