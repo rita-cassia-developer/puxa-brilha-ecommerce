@@ -250,3 +250,24 @@ body { background: var(--market-bg); color: #1f2937; font-family: Inter, Arial, 
 
 .admin-shell .button { text-transform: none; }
 .admin-shell .eyebrow-small { text-transform: uppercase; }
+
+/* Conversão e confiança para a demonstração */
+.market-payments { min-height: 105px; display: grid; grid-template-columns: 1.3fr 1fr .9fr; align-items: center; gap: 24px; margin-bottom: 18px; padding: 20px 28px; background: #fff; border: 1px solid var(--market-border); }
+.market-payments h2 { margin-top: 5px; color: var(--market-navy); font-size: 18px; letter-spacing: -.03em; }
+.market-payments p { margin-top: 4px; color: var(--market-muted); font-size: 10px; }
+.payment-methods { display: flex; align-items: center; gap: 8px; }
+.payment-method { min-width: 52px; height: 30px; display: grid; place-items: center; padding: 0 8px; background: #f6f8fa; border: 1px solid var(--market-border); color: var(--market-navy); font-size: 10px; font-weight: 800; }
+.payment-pix { color: var(--market-green); }
+.payment-card { color: #315f9c; font-style: italic; }
+.mastercard { color: #e05c4b; letter-spacing: -3px; }
+.payment-boleto { font-size: 8px; letter-spacing: .04em; }
+.payment-note { display: flex; align-items: center; gap: 9px; color: var(--market-green); }
+.payment-note span { display: flex; flex-direction: column; gap: 3px; }
+.payment-note b { color: var(--market-navy); font-size: 11px; }
+.payment-note small { color: var(--market-muted); font-size: 9px; }
+.footer-social-links { display: flex !important; flex-direction: row !important; flex-wrap: wrap; gap: 10px !important; margin-top: 9px; }
+.footer-social-links b { width: 100%; margin-bottom: 0 !important; }
+.footer-social-links a { color: var(--market-orange) !important; font-weight: 700; }
+.whatsapp-float { position: fixed; z-index: 40; right: 22px; bottom: 22px; display: inline-flex; align-items: center; gap: 8px; min-height: 43px; padding: 0 15px; color: #fff; background: #20b978; border: 0; border-radius: 24px; box-shadow: 0 7px 20px rgba(18,121,79,.25); font-size: 11px; font-weight: 800; cursor: pointer; transition: transform .2s ease, background .2s ease; }
+.whatsapp-float:hover { background: #159b63; transform: translateY(-2px); }
+@media (max-width: 700px) { .market-payments { grid-template-columns: 1fr; gap: 12px; padding: 18px; } .payment-methods { flex-wrap: wrap; } .payment-note { padding-top: 5px; border-top: 1px solid var(--market-border); } .whatsapp-float { right: 14px; bottom: 14px; } }
