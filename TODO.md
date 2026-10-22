@@ -1,30 +1,24 @@
 # Entregas do protótipo Lumera
 
-## Vitrine profissional de cosméticos
-- A página inicial deve apresentar uma loja de cosméticos com navegação, hero da marca, categorias, produtos em destaque, preços, badges e CTAs funcionais.
-- O protótipo deve manter linguagem visual consistente de boutique premium e ser responsivo para desktop e mobile.
+## Marketplace profissional
+- A vitrine deve apresentar header de marketplace com busca central, categorias, acesso administrativo, favoritos e carrinho.
+- A experiência deve usar cores com intenção comercial e psicológica: coral para ação, amarelo para ofertas, azul marinho para confiança, branco/cinza para comparação e verde para segurança.
+- A interface deve usar tipografia sans-serif legível, com capitalização correta em títulos, labels, botões e mensagens.
 
-## Carrinho e jornada de compra
+## Catálogo e conversão
+- O usuário deve conseguir buscar, filtrar por categoria, ordenar por preço e ver cards com preço, preço anterior, desconto, avaliação, vendidos, parcelamento e CTA.
 - O usuário deve conseguir adicionar produtos, alterar quantidades, remover itens e revisar subtotal, frete e total.
-- O carrinho deve abrir sem recarregar a página e apresentar estado vazio quando não houver itens.
 
-## Cálculo de frete simulado
-- O usuário deve informar endereço/CEP no checkout e conseguir calcular frete através do endereço.
-- O cálculo deve ser simulado, determinístico e apresentar prazo e valor antes da confirmação.
-- CEP inválido ou incompleto deve gerar orientação clara sem quebrar o fluxo.
+## Frete e checkout
+- O usuário deve informar endereço/CEP e calcular frete simulado com prazo e valor antes da confirmação.
+- O pagamento deve oferecer Pix, cartão e boleto em ambiente explicitamente demonstrativo, sem cobrança real.
+- Após confirmar, o checkout deve apresentar pedido simulado, forma de pagamento e prazo de entrega.
 
-## Ambiente de pagamento simulado
-- O checkout deve permitir escolher cartão, Pix ou boleto em ambiente demonstrativo.
-- O protótipo não pode processar pagamento real e deve deixar explícito que a confirmação é simulada.
-- Após confirmar, deve apresentar sucesso com número de pedido demonstrativo e opção de voltar à loja.
+## Painel administrativo
+- `/admin` deve permitir adicionar produtos com nome, categoria, preço, estoque, selo, nota e descrição.
+- `/admin` deve permitir editar e remover produtos com confirmação.
+- As alterações devem persistir no navegador, aparecer na vitrine e atualizar métricas do painel.
 
-## Painel administrativo de produtos
-- Deve existir painel administrativo navegável em `/admin`.
-- O administrador deve conseguir adicionar produtos, inserir nome, categoria, preço, estoque, descrição, selo e imagem.
-- O administrador deve conseguir editar e remover produtos com confirmação.
-- As alterações devem aparecer na vitrine durante a demonstração e persistir no navegador.
-- O painel deve apresentar métricas resumidas e estados vazios/feedback para ações concluídas.
-
-## Estabilidade da demonstração
-- A jornada principal não deve depender de serviços externos, CEP real, gateway de pagamento, login ou dados remotos.
-- Deve haver catálogo inicial funcional, fallback de imagens, validações de formulário e persistência local para recarregamentos.
+## Estabilidade
+- A demonstração não deve depender de login, CEP real, gateway, imagens remotas ou API externa.
+- Deve existir catálogo inicial, validação de campos, fallback visual, estados vazios e mensagens de confirmação.
