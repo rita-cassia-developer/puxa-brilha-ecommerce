@@ -18,9 +18,9 @@ Troca da serif editorial por uma sans-serif de interface (Inter/Arial fallback),
 - Navegação horizontal por categorias.
 - Hero promocional com oferta, CTA primário e promessa de frete.
 - Faixa de benefícios para reduzir insegurança.
-- Categorias visuais, filtros, ordenação, cards com avaliação, vendidos, desconto, parcelamento e ação de compra.
-- Checkout simulado com CEP, endereço, frete determinístico, métodos de pagamento e confirmação explícita.
+- Categorias visuais, filtros, ordenação, cards com avaliação, vendidos, desconto, parcelamento e ação de compra; o catálogo inicial contém no mínimo 10 produtos em cada categoria (Rosto, Corpo, Cabelos, Fragrâncias e Maquiagem), incluindo batons pesquisáveis.
+- Checkout simulado com CEP, endereço, frete determinístico, opções clicáveis de Pix, cartão de crédito e boleto, campos de cartão apenas demonstrativos e confirmação explícita.
 - Painel `/admin` com CRUD local: adicionar, editar, remover, preço, estoque, categoria, selo, nota e descrição. Alterações ficam persistidas no navegador e aparecem na vitrine.
 
 ## Robustez de demonstração
-A jornada não depende de CEP real, gateway, login ou API externa. O carrinho, catálogo e alterações do painel usam `localStorage`, com validações e estados de erro. Pagamento é sempre identificado como simulado.
+A jornada não depende de CEP real, gateway, login ou API externa. O carrinho, catálogo e alterações do painel usam `localStorage`, com validações e estados de erro. Pagamento é sempre identificado como simulado e pode ser aberto pelos botões de método após adicionar um item ao carrinho.

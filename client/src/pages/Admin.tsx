@@ -11,6 +11,7 @@ const categoryLabels: Record<Exclude<Category, never> | "Todos", string> = {
   Body: "Corpo",
   Hair: "Cabelos",
   Fragrance: "Fragrâncias",
+  Makeup: "Maquiagem",
 };
 
 const emptyForm: Omit<Product, "id"> = {
@@ -23,11 +24,11 @@ const emptyForm: Omit<Product, "id"> = {
   note: "Ingrediente principal",
 };
 
-function AdminSidebar({ active }: { active: string }) {
+function AdminSidebar({ active, count }: { active: string; count: number }) {
   return <aside className="admin-sidebar">
     <Link href="/" className="admin-logo"><span className="wordmark-mark">⌒</span>lumera<span className="admin-logo-sub">Studio</span></Link>
     <div className="admin-workspace"><span className="workspace-dot" /><span><b>Loja principal</b><small>Ambiente de demonstração</small></span></div>
-    <nav className="admin-nav"><span className="admin-nav-label">Gestão</span><a className={active === "overview" ? "active" : ""} href="#overview"><LayoutGrid size={17} />Visão geral</a><a className={active === "products" ? "active" : ""} href="#products"><Package size={17} />Produtos <span className="nav-count">6</span></a><a href="#orders"><ShoppingBag size={17} />Pedidos <span className="nav-pill">Demo</span></a><span className="admin-nav-label admin-nav-label-spaced">Configurações</span><a href="#settings"><Settings2 size={17} />Preferências</a></nav>
+    <nav className="admin-nav"><span className="admin-nav-label">Gestão</span><a className={active === "overview" ? "active" : ""} href="#overview"><LayoutGrid size={17} />Visão geral</a><a className={active === "products" ? "active" : ""} href="#products"><Package size={17} />Produtos <span className="nav-count">{count}</span></a><a href="#orders"><ShoppingBag size={17} />Pedidos <span className="nav-pill">Demo</span></a><span className="admin-nav-label admin-nav-label-spaced">Configurações</span><a href="#settings"><Settings2 size={17} />Preferências</a></nav>
     <div className="admin-sidebar-footer"><div className="admin-avatar">LM</div><div><b>Loja Lumera</b><small>Administrador</small></div><button aria-label="Mais opções">•••</button></div>
   </aside>;
 }
@@ -74,7 +75,7 @@ export default function Admin() {
     if (!window.confirm(`Remover “${product.name}” da vitrine?`)) return;
     const next = products.filter(item => item.id !== product.id); setProducts(next); saveProducts(next); toast.success("Produto removido da vitrine.");
   };
-  return <div className="admin-shell"><AdminSidebar active={active} /><main className="admin-main">
+  return <div className="admin-shell"><AdminSidebar active={active} count={products.length} /><main className="admin-main">
     <header className="admin-header"><div className="admin-breadcrumb"><button onClick={() => setLocation("/")}><ArrowLeft size={16} /> Voltar à loja</button><span>/</span><b>Produtos</b></div><div className="admin-header-actions"><span className="demo-status"><span /> Dados salvos localmente</span><button className="icon-button" aria-label="Visualizar vitrine"><Eye size={18} /></button><button className="admin-profile"><span className="admin-avatar">LM</span><ChevronDownIcon /></button></div></header>
     <div className="admin-content" id="overview"><div className="admin-title-row"><div><span className="eyebrow-small">Lumera Studio / Catálogo</span><h1>Olá, loja Lumera.</h1><p>Acompanhe sua vitrine e mantenha o essencial em movimento.</p></div><button className="button button-dark" onClick={() => { setEditing(null); setFormOpen(true); }}><Plus size={17} /> Novo produto</button></div>
       <div className="stats-grid"><div className="stat-card"><div className="stat-icon olive"><Package size={18} /></div><span>Produtos ativos</span><strong>{products.length}</strong><small><span className="positive">+{products.length ? 100 : 0}%</span> Catálogo preenchido</small></div><div className="stat-card"><div className="stat-icon clay"><BarChart3 size={18} /></div><span>Valor em estoque</span><strong>{formatCurrency(inventoryValue)}</strong><small>Baseado no estoque atual</small></div><div className="stat-card"><div className="stat-icon sand"><ShoppingBag size={18} /></div><span>Pedidos simulados</span><strong>24</strong><small><span className="positive">+12,5%</span> Vs. mês anterior</small></div><div className="stat-card"><div className="stat-icon rose"><SparklineIcon /></div><span>Conversão estimada</span><strong>4,8%</strong><small><span className="positive">+0,6%</span> Esta semana</small></div></div>

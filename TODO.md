@@ -7,11 +7,12 @@
 
 ## Catálogo e conversão
 - O usuário deve conseguir buscar, filtrar por categoria, ordenar por preço e ver cards com preço, preço anterior, desconto, avaliação, vendidos, parcelamento e CTA.
+- O catálogo inicial deve conter pelo menos 10 produtos distintos em cada categoria Rosto, Corpo, Cabelos, Fragrâncias e Maquiagem; a busca por “batom” deve retornar produtos.
 - O usuário deve conseguir adicionar produtos, alterar quantidades, remover itens e revisar subtotal, frete e total.
 
 ## Frete e checkout
 - O usuário deve informar endereço/CEP e calcular frete simulado com prazo e valor antes da confirmação.
-- O pagamento deve oferecer Pix, cartão e boleto em ambiente explicitamente demonstrativo, sem cobrança real.
+- O pagamento deve oferecer botões clicáveis de Pix, cartão de crédito e boleto em ambiente explicitamente demonstrativo, sem cobrança real; o cartão pode exibir campos de teste e o pedido deve registrar o método escolhido.
 - Após confirmar, o checkout deve apresentar pedido simulado, forma de pagamento e prazo de entrega.
 
 ## Painel administrativo
