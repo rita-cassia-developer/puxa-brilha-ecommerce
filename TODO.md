@@ -12,6 +12,7 @@
 
 ## Frete e checkout
 - O usuário deve informar endereço/CEP e calcular frete simulado com prazo e valor antes da confirmação.
+- O usuário deve poder escolher “Receber em casa” ou “Retirar na loja”; ao retirar, o checkout deve mostrar o endereço da Loja Lumera, dispensar CEP/endereço de entrega, exibir frete grátis e prazo de preparo.
 - O pagamento deve oferecer botões clicáveis de Pix, cartão de crédito e boleto em ambiente explicitamente demonstrativo, sem cobrança real; o cartão pode exibir campos de teste e o pedido deve registrar o método escolhido.
 - Após confirmar, o checkout deve apresentar pedido simulado, forma de pagamento e prazo de entrega.
 

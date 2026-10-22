@@ -278,3 +278,18 @@ body { background: var(--market-bg); color: #1f2937; font-family: Inter, Arial, 
 .payment-card { min-width: 126px; color: #315f9c; font-style: normal; font-size: 9px; }
 .payment-pix, .payment-boleto { min-width: 82px; }
 .category-circle-art.makeup { background: #f4d3dc; color: #bd4966; }
+
+.fulfillment-choice-list { display: flex; flex-direction: column; gap: 8px; margin: -7px 0 17px; }
+.fulfillment-choice { display: flex; align-items: center; gap: 11px; width: 100%; padding: 12px; color: var(--market-navy); background: #fff; border: 1px solid var(--market-border); text-align: left; cursor: pointer; }
+.fulfillment-choice.selected { border-color: var(--market-orange); box-shadow: 0 0 0 1px var(--market-orange); }
+.fulfillment-choice > svg { color: var(--market-orange); }
+.fulfillment-choice > span { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.fulfillment-choice b { font-size: 11px; }
+.fulfillment-choice small { color: var(--market-muted); font-size: 9px; }
+.fulfillment-choice i { width: 14px; height: 14px; border: 1px solid #b8c0c8; border-radius: 50%; }
+.fulfillment-choice.selected i { border: 4px solid #fff; background: var(--market-orange); box-shadow: 0 0 0 1px var(--market-orange); }
+.pickup-store-card { display: flex; align-items: flex-start; gap: 10px; padding: 12px; margin: -3px 0 17px; color: var(--market-orange); background: #fff9e8; border: 1px solid #f3df9b; }
+.pickup-store-card > div { display: flex; flex-direction: column; gap: 3px; }
+.pickup-store-card b { color: var(--market-navy); font-size: 11px; }
+.pickup-store-card span, .pickup-store-card small { color: var(--market-muted); font-size: 9px; }
+.field-muted { opacity: .6; }
