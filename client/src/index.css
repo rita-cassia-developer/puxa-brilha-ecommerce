@@ -4,16 +4,16 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --olive: #5c664a;
-  --olive-dark: #37402c;
-  --ink: #232721;
-  --ink-soft: #60655c;
-  --paper: #f5f3ed;
-  --paper-deep: #ebe8df;
-  --line: #dcd9cf;
-  --clay: #b66e54;
-  --rose: #d8a49d;
-  --sand: #d5b987;
+  --olive: #b87582;
+  --olive-dark: #713d49;
+  --ink: #2d2528;
+  --ink-soft: #76666b;
+  --paper: #fffafb;
+  --paper-deep: #f7e9ec;
+  --line: #ead9dd;
+  --clay: #c66f7d;
+  --rose: #e7b8c1;
+  --sand: #f1d9dc;
   --white: #fffefa;
   --radius: 3px;
   font-family: "DM Sans", sans-serif;
