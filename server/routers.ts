@@ -2,7 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, publicProcedure, router } from "./_core/trpc";
-import { createOrder, createProduct, deleteProduct, listOrders, listProducts, updateProduct } from "./db";
+import { createOrder, createProduct, deleteProduct, listOrders, listProducts, updateOrderStatus, updateProduct } from "./db";
 import { z } from "zod";
 
 const productInput = z.object({
@@ -84,6 +84,14 @@ export const appRouter = router({
       fulfillment: z.enum(["delivery", "pickup"]),
     })).mutation(({ input }) => createOrder(input)),
     list: adminProcedure.query(() => listOrders()),
+    updateStatus: adminProcedure.input(z.object({
+      id: z.number().int().positive(),
+      paymentStatus: z.enum(["pending", "approved", "rejected", "refunded"]).optional(),
+      orderStatus: z.enum(["pending", "paid", "processing", "shipped", "ready_pickup", "completed", "cancelled"]).optional(),
+    })).mutation(({ input }) => {
+      const { id, ...values } = input;
+      return updateOrderStatus(id, values);
+    }),
   }),
 
   // TODO: add feature routers here, e.g.

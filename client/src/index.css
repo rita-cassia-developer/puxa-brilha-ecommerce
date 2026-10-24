@@ -484,3 +484,9 @@ body, .marketplace { background: var(--label-paper) !important; }
 .order-label { text-transform: uppercase; letter-spacing: .08em; }
 .order-status { display: inline-flex; align-items: center; gap: 6px; color: #8e6a3f; font-size: 10px; font-weight: 700; white-space: nowrap; }
 @media (max-width: 820px) { .admin-order-row { grid-template-columns: 1fr 1fr; gap: 12px; } .admin-order-row > div:first-child { grid-column: 1 / -1; } .order-status { justify-self: start; } }
+
+.orders-head-actions { display: flex; align-items: center; gap: 14px; }
+.orders-filter, .order-status-select { color: #6e293a; background: #fffaf7; border: 1px solid rgba(181,138,82,.4); font: inherit; font-size: 11px; }
+.orders-filter { padding: 8px 10px; }
+.order-status-select { display: block; margin-top: 5px; padding: 4px 5px; font-size: 10px; }
+@media (max-width: 650px) { .orders-head-actions { align-items: flex-start; flex-direction: column; gap: 8px; } .orders-filter { width: 100%; } }

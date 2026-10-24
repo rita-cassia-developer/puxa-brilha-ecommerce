@@ -160,3 +160,11 @@ export async function listOrders() {
   if (!db) throw new Error("Database is not available");
   return db.select().from(orders).orderBy(desc(orders.createdAt)).limit(100);
 }
+
+export async function updateOrderStatus(id: number, input: { paymentStatus?: "pending" | "approved" | "rejected" | "refunded"; orderStatus?: "pending" | "paid" | "processing" | "shipped" | "ready_pickup" | "completed" | "cancelled" }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  await db.update(orders).set(input).where(eq(orders.id, id));
+  const rows = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+  return rows[0];
+}
