@@ -4,6 +4,7 @@ import { ArrowRight, Check, ChevronDown, CreditCard, Heart, HelpCircle, LockKeyh
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
+import { trpc } from "@/lib/trpc";
 
 const categoryLinks = ["Todas as categorias", "Cera de depilação", "Abaixador de língua", "Tiras de depilação", "Ofertas"];
 const categoryMap: Record<string, Product["category"] | "Todos"> = { "Cera de depilação": "Wax", "Abaixador de língua": "Wax", "Tiras de depilação": "Wax" };
@@ -70,14 +71,19 @@ function Summary({ items, cart, subtotal, shipping, total }: { items: Product[];
 }
 
 export default function Home() {
-  const [products, setProducts] = useState<Product[]>(() => loadProducts());
+  const localProducts = useState<Product[]>(() => loadProducts())[0];
+  const catalogQuery = trpc.catalog.list.useQuery(undefined, { retry: 1 });
+  const products: Product[] = catalogQuery.data?.map(row => ({
+    id: String(row.id), name: row.name, category: "Wax", price: Number(row.price), oldPrice: row.oldPrice == null ? undefined : Number(row.oldPrice),
+    badge: row.badge ?? undefined, description: row.description, stock: row.stock, weightKg: row.weightGrams / 1000,
+    accent: (row.accent as Product["accent"]) || "rose", note: row.note || "Cera depilatória profissional",
+  })) ?? localProducts;
   const [cart, setCart] = useState<Cart>(() => loadCart());
   const [category, setCategory] = useState("Todos");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("relevance");
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  useEffect(() => { const sync = () => setProducts(loadProducts()); window.addEventListener("yaffa-products-updated", sync); return () => window.removeEventListener("yaffa-products-updated", sync); }, []);
   useEffect(() => saveCart(cart), [cart]);
   const visibleProducts = useMemo(() => { const filtered = products.filter(product => (category === "Todos" || product.category === category) && `${product.name} ${product.description}`.toLowerCase().includes(query.toLowerCase())); return [...filtered].sort((a, b) => sort === "price-low" ? a.price - b.price : sort === "price-high" ? b.price - a.price : 0); }, [products, category, query, sort]);
   const cartCount = Object.values(cart).reduce((sum, value) => sum + value, 0);

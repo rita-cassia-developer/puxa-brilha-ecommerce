@@ -1,6 +1,7 @@
 import { ProductVisual } from "@/components/ProductVisual";
-import { categories, formatCurrency, loadProducts, saveProducts, type Category, type Product } from "@/lib/store";
-import { ArrowLeft, BarChart3, Check, Edit3, Eye, LayoutGrid, Package, Plus, Search, Settings2, ShoppingBag, Trash2, X } from "lucide-react";
+import { categories, formatCurrency, type Category, type Product } from "@/lib/store";
+import { trpc } from "@/lib/trpc";
+import { ArrowLeft, BarChart3, Check, Edit3, Eye, LayoutGrid, LoaderCircle, Package, Plus, Search, Settings2, ShoppingBag, Trash2, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
@@ -54,29 +55,42 @@ function ProductForm({ product, onCancel, onSave }: { product: Product | null; o
 
 export default function Admin() {
   const [, setLocation] = useLocation();
-  const [products, setProducts] = useState<Product[]>(() => loadProducts());
   const [query, setQuery] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [active] = useState("products");
-  const filtered = useMemo(() => products.filter(product => `${product.name} ${categoryLabels[product.category]}`.toLowerCase().includes(query.toLowerCase())), [products, query]);
+  const productsQuery = trpc.products.list.useQuery({ search: query || undefined }, { retry: false });
+  const createProduct = trpc.products.create.useMutation({ onSuccess: () => productsQuery.refetch() });
+  const updateProduct = trpc.products.update.useMutation({ onSuccess: () => productsQuery.refetch() });
+  const removeProduct = trpc.products.remove.useMutation({ onSuccess: () => productsQuery.refetch() });
+  const products: Product[] = (productsQuery.data ?? []).map(row => ({
+    id: String(row.id), name: row.name, category: "Wax", price: Number(row.price), oldPrice: row.oldPrice == null ? undefined : Number(row.oldPrice),
+    badge: row.badge ?? undefined, description: row.description, stock: row.stock, weightKg: row.weightGrams / 1000,
+    accent: (row.accent as Product["accent"]) || "rose", note: row.note || "Cera depilatória profissional",
+  }));
   const inventoryValue = products.reduce((sum, product) => sum + product.price * product.stock, 0);
-  const save = (payload: Omit<Product, "id">) => {
-    const next = editing ? products.map(product => product.id === editing.id ? { ...payload, id: editing.id } : product) : [...products, { ...payload, id: `product-${Date.now()}` }];
-    setProducts(next); saveProducts(next); setFormOpen(false); setEditing(null); toast.success(editing ? "Produto atualizado com sucesso." : "Produto adicionado à vitrine.");
+  const save = async (payload: Omit<Product, "id">) => {
+    const input = { name: payload.name, category: payload.category, description: payload.description, price: payload.price, oldPrice: payload.oldPrice ?? null, badge: payload.badge ?? null, accent: payload.accent, note: payload.note ?? null, stock: payload.stock, weightGrams: Math.round((payload.weightKg ?? 1.4) * 1000), status: "active" as const };
+    try {
+      if (editing) await updateProduct.mutateAsync({ ...input, id: Number(editing.id) });
+      else await createProduct.mutateAsync(input);
+      setFormOpen(false); setEditing(null); toast.success(editing ? "Produto atualizado no banco." : "Produto adicionado ao catálogo.");
+    } catch { toast.error("Não foi possível salvar o produto. Tente novamente."); }
   };
-  const remove = (product: Product) => {
+  const remove = async (product: Product) => {
     if (!window.confirm(`Remover “${product.name}” da vitrine?`)) return;
-    const next = products.filter(item => item.id !== product.id); setProducts(next); saveProducts(next); toast.success("Produto removido da vitrine.");
+    try { await removeProduct.mutateAsync({ id: Number(product.id) }); toast.success("Produto removido do banco."); }
+    catch { toast.error("Não foi possível remover este produto."); }
   };
+  if (productsQuery.isLoading) return <div className="auth-gate"><LoaderCircle className="auth-spinner" size={26} /><p>Carregando catálogo seguro…</p></div>;
+  if (productsQuery.isError) return <div className="auth-gate"><div className="auth-gate-card"><div className="auth-gate-icon"><Package size={22} /></div><h1>Catálogo indisponível</h1><p>Não foi possível consultar o banco de dados neste momento.</p><button className="auth-gate-button" onClick={() => productsQuery.refetch()}>Tentar novamente</button></div></div>;
   return <div className="admin-shell"><AdminSidebar active={active} count={products.length} /><main className="admin-main">
-    <header className="admin-header"><div className="admin-breadcrumb"><button onClick={() => setLocation("/")}><ArrowLeft size={16} /> Voltar à loja</button><span>/</span><b>Produtos</b></div><div className="admin-header-actions"><span className="demo-status"><span /> Dados salvos localmente</span><button className="icon-button" aria-label="Visualizar vitrine"><Eye size={18} /></button><button className="admin-profile"><span className="admin-avatar">YF</span><ChevronDownIcon /></button></div></header>
-    <div className="admin-content" id="overview"><div className="admin-title-row"><div><span className="eyebrow-small">Yaffa Cosméticos Studio / Catálogo</span><h1>Olá, loja Yaffa Cosméticos.</h1><p>Acompanhe sua vitrine e mantenha o essencial em movimento.</p></div><button className="button button-dark" onClick={() => { setEditing(null); setFormOpen(true); }}><Plus size={17} /> Novo produto</button></div>
-      <div className="stats-grid"><div className="stat-card"><div className="stat-icon olive"><Package size={18} /></div><span>Produtos ativos</span><strong>{products.length}</strong><small><span className="positive">+{products.length ? 100 : 0}%</span> Catálogo preenchido</small></div><div className="stat-card"><div className="stat-icon clay"><BarChart3 size={18} /></div><span>Valor em estoque</span><strong>{formatCurrency(inventoryValue)}</strong><small>Baseado no estoque atual</small></div><div className="stat-card"><div className="stat-icon sand"><ShoppingBag size={18} /></div><span>Pedidos simulados</span><strong>24</strong><small><span className="positive">+12,5%</span> Vs. mês anterior</small></div><div className="stat-card"><div className="stat-icon rose"><SparklineIcon /></div><span>Conversão estimada</span><strong>4,8%</strong><small><span className="positive">+0,6%</span> Esta semana</small></div></div>
-      <section className="admin-section" id="products"><div className="admin-section-head"><div><span className="eyebrow-small">Catálogo da loja</span><h2>Todos os produtos <span>{products.length}</span></h2></div><div className="admin-list-tools"><label className="search-field"><Search size={16} /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Buscar produto" /></label><button className="filter-button">Filtros <span>0</span></button></div></div><div className="product-table"><div className="table-head"><span>Produto</span><span>Categoria</span><span>Preço</span><span>Estoque</span><span>Status</span><span /></div>{filtered.length === 0 ? <div className="admin-empty"><Package size={21} /><h3>Nenhum produto encontrado.</h3><p>Tente outro termo ou adicione um novo item.</p></div> : filtered.map(product => <div className="table-row" key={product.id}><div className="table-product"><ProductVisual product={product} compact /><div><strong>{product.name}</strong><small>ID {product.id}</small></div></div><span className="table-category">{categoryLabels[product.category]}</span><strong className="table-price">{formatCurrency(product.price)}</strong><span className={product.stock < 10 ? "stock-low" : "stock-ok"}>{product.stock} un.</span><span><span className="status-active"><span /> Ativo</span></span><div className="table-actions"><button onClick={() => { setEditing(product); setFormOpen(true); }} aria-label={`Editar ${product.name}`}><Edit3 size={16} /></button><button onClick={() => remove(product)} aria-label={`Remover ${product.name}`}><Trash2 size={16} /></button></div></div>)}</div></section>
-      <section className="admin-tip"><div className="tip-icon"><SparklineIcon /></div><div><strong>Dica para sua demonstração</strong><p>Adicione um produto novo, altere o preço e volte à vitrine. As mudanças são salvas neste navegador e aparecem instantaneamente na loja.</p></div><button onClick={() => setLocation("/")}>Ver vitrine <ArrowLeft size={15} /></button></section>
+    <header className="admin-header"><div className="admin-breadcrumb"><button onClick={() => setLocation("/")}><ArrowLeft size={16} /> Voltar à loja</button><span>/</span><b>Produtos</b></div><div className="admin-header-actions"><span className="demo-status"><span /> Dados salvos no banco</span><button className="icon-button" aria-label="Visualizar vitrine" onClick={() => setLocation("/")}><Eye size={18} /></button><button className="admin-profile"><span className="admin-avatar">YF</span><ChevronDownIcon /></button></div></header>
+    <div className="admin-content" id="overview"><div className="admin-title-row"><div><span className="eyebrow-small">Yaffa Cosméticos Studio / Catálogo</span><h1>Olá, loja Yaffa Cosméticos.</h1><p>Produtos cadastrados no banco de dados oficial da loja.</p></div><button className="button button-dark" onClick={() => { setEditing(null); setFormOpen(true); }}><Plus size={17} /> Novo produto</button></div>
+      <div className="stats-grid"><div className="stat-card"><div className="stat-icon olive"><Package size={18} /></div><span>Produtos ativos</span><strong>{products.length}</strong><small><span className="positive">Banco real</span> Catálogo persistente</small></div><div className="stat-card"><div className="stat-icon clay"><BarChart3 size={18} /></div><span>Valor em estoque</span><strong>{formatCurrency(inventoryValue)}</strong><small>Baseado no estoque atual</small></div><div className="stat-card"><div className="stat-icon sand"><ShoppingBag size={18} /></div><span>Pedidos</span><strong>0</strong><small>Pedidos reais serão conectados na próxima fase</small></div><div className="stat-card"><div className="stat-icon rose"><SparklineIcon /></div><span>Leads</span><strong>0</strong><small>Captação será ativada na Fase 2</small></div></div>
+      <section className="admin-section" id="products"><div className="admin-section-head"><div><span className="eyebrow-small">Catálogo persistente</span><h2>Todos os produtos <span>{products.length}</span></h2></div><div className="admin-list-tools"><label className="search-field"><Search size={16} /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Buscar produto" /></label><button className="filter-button">Filtros <span>0</span></button></div></div><div className="product-table"><div className="table-head"><span>Produto</span><span>Categoria</span><span>Preço</span><span>Estoque</span><span>Status</span><span /></div>{products.length === 0 ? <div className="admin-empty"><Package size={21} /><h3>Nenhum produto encontrado.</h3><p>Adicione o primeiro produto ao banco da Yaffa.</p></div> : products.map(product => <div className="table-row" key={product.id}><div className="table-product"><ProductVisual product={product} compact /><div><strong>{product.name}</strong><small>ID {product.id}</small></div></div><span className="table-category">{categoryLabels[product.category]}</span><strong className="table-price">{formatCurrency(product.price)}</strong><span className={product.stock < 10 ? "stock-low" : "stock-ok"}>{product.stock} un.</span><span><span className="status-active"><span /> Ativo</span></span><div className="table-actions"><button onClick={() => { setEditing(product); setFormOpen(true); }} aria-label={`Editar ${product.name}`}><Edit3 size={16} /></button><button onClick={() => remove(product)} aria-label={`Remover ${product.name}`}><Trash2 size={16} /></button></div></div>)}</div></section>
+      <section className="admin-tip"><div className="tip-icon"><SparklineIcon /></div><div><strong>Catálogo persistente</strong><p>As alterações agora ficam salvas no banco e poderão ser acessadas pela proprietária em outros dispositivos.</p></div><button onClick={() => setLocation("/")}>Ver vitrine <ArrowLeft size={15} /></button></section>
     </div></main>{formOpen && <div className="overlay"><ProductForm product={editing} onCancel={() => { setFormOpen(false); setEditing(null); }} onSave={save} /></div>}</div>;
 }
-
 function ChevronDownIcon() { return <span className="chevron-down">⌄</span>; }
 function SparklineIcon() { return <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 13.5 6.2 9.3l2.7 2.7L15.8 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /><path d="M12.2 5H16v3.8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>; }
