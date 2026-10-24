@@ -365,3 +365,38 @@ body { background: var(--market-bg); color: #1f2937; font-family: Inter, Arial, 
   .yaffa-hero-sticker { top: 46px; right: 11%; }
   .yaffa-hero-caption { bottom: 24px; }
 }
+
+/* Paleta Yaffa — rosé blush, rosé queimado, vinho rosado e branco quente */
+:root {
+  --market-orange: #c9878f;
+  --market-orange-dark: #7a3f4a;
+  --market-yellow: #f4dde2;
+  --market-navy: #4a2c33;
+  --market-muted: #806b70;
+  --market-bg: #fffcfa;
+  --market-border: #edd5d9;
+  --market-green: #4f8b78;
+}
+body, .marketplace { background: #fffcfa !important; }
+.market-header, .category-nav, .market-footer, .market-cart-drawer, .market-checkout { background: #fffcfa !important; }
+.yaffa-hero { background: #f4dde2; border-color: #e8c7ce; }
+.yaffa-hero-copy { background: #f4dde2; }
+.yaffa-eyebrow, .market-overline, .market-product-category { color: #7a3f4a !important; }
+.yaffa-hero h1, .section-title-row h2, .market-products h2, .market-categories h2 { color: #4a2c33; }
+.yaffa-hero h1 em { color: #7a3f4a; }
+.yaffa-hero p, .yaffa-hero-points, .yaffa-hero-caption span { color: #806b70; }
+.market-primary-cta, .button-dark { background: #c9878f !important; }
+.market-primary-cta:hover, .button-dark:hover { background: #7a3f4a !important; }
+.yaffa-hero-product { background: #fffcfa; }
+.yaffa-hero-product::before { background: #f4dde2; }
+.yaffa-jar-lid { background: linear-gradient(#9b5663, #7a3f4a); box-shadow: 0 6px 0 #66323d; }
+.yaffa-jar { background: linear-gradient(145deg, #d39aa0, #a85e6a); box-shadow: 14px 17px 0 rgba(122,63,74,.14), 0 25px 40px rgba(122,63,74,.18); }
+.yaffa-jar b { color: #7a3f4a; background: #fffaf8; }
+.yaffa-hero-sticker { background: #7a3f4a; }
+.yaffa-hero-caption { border-left-color: #c9878f; background: rgba(255,252,250,.92); }
+.product-visual { background: #f8e8eb !important; }
+.market-benefits, .market-payments, .market-product-card, .market-section, .admin-section { border-color: #edd5d9 !important; }
+.category-circle-art { background: #f4dde2 !important; color: #7a3f4a !important; }
+.market-filter-row button.active { color: #7a3f4a; border-color: #c9878f; }
+.market-footer { border-top-color: #edd5d9 !important; }
+.mobile-admin-link { background: #f8e8eb !important; border-color: #e8c7ce !important; }
