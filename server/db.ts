@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray, like } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, orderItems, orders, products, users } from "../drizzle/schema";
 import { ENV } from "./_core/env";
@@ -153,4 +153,10 @@ export async function createOrder(input: CreateOrderInput) {
     return orderId;
   });
   return { id: result, code, subtotal, shipping, total };
+}
+
+export async function listOrders() {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  return db.select().from(orders).orderBy(desc(orders.createdAt)).limit(100);
 }
