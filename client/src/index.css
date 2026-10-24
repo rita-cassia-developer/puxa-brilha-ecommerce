@@ -400,3 +400,62 @@ body, .marketplace { background: #fffcfa !important; }
 .market-filter-row button.active { color: #7a3f4a; border-color: #c9878f; }
 .market-footer { border-top-color: #edd5d9 !important; }
 .mobile-admin-link { background: #f8e8eb !important; border-color: #e8c7ce !important; }
+
+/* Identidade do rótulo Yaffa — aquarela rosa, borgonha, ouro envelhecido e morango */
+:root {
+  --label-pink: #f4d7df;
+  --label-pink-light: #fff2f4;
+  --label-burgundy: #6e293a;
+  --label-gold: #b58a52;
+  --label-red: #c8424f;
+  --label-leaf: #668e5a;
+  --label-paper: #fffaf7;
+}
+body, .marketplace { background: var(--label-paper) !important; }
+.market-header, .category-nav, .market-footer, .market-cart-drawer, .market-checkout { background: var(--label-paper) !important; }
+.market-topline { background: var(--label-burgundy) !important; }
+.market-logo { color: var(--label-burgundy) !important; font-family: "Cormorant Garamond", Georgia, serif; font-size: 30px; font-weight: 700; letter-spacing: -.04em; }
+.market-logo small { font-family: Inter, Arial, sans-serif; color: var(--label-gold) !important; letter-spacing: .02em; }
+.logo-symbol { color: var(--label-paper) !important; background: var(--label-burgundy) !important; border-radius: 50% !important; font-family: "Cormorant Garamond", Georgia, serif; }
+.market-search { border-color: var(--label-gold) !important; background: var(--label-pink-light) !important; }
+.market-search button { background: var(--label-burgundy) !important; }
+.category-nav { border-bottom-color: rgba(181,138,82,.35) !important; }
+.category-nav a, .category-menu { color: var(--label-burgundy) !important; }
+.category-promise { color: var(--label-gold) !important; }
+.yaffa-hero { background: linear-gradient(135deg, #f4d7df 0%, #fae8ec 50%, #f8dfe5 100%); border-color: rgba(181,138,82,.48); box-shadow: inset 0 0 0 1px rgba(255,250,247,.65); }
+.yaffa-hero-copy { background: radial-gradient(circle at 14% 20%, rgba(255,255,255,.55), transparent 31%), linear-gradient(145deg, #f4d7df, #fae8ec); }
+.yaffa-eyebrow, .market-overline, .market-product-category { color: var(--label-burgundy) !important; letter-spacing: .13em; }
+.yaffa-hero h1, .section-title-row h2, .market-products h2, .market-categories h2 { color: var(--label-burgundy); font-family: "Cormorant Garamond", Georgia, serif; font-weight: 700; }
+.yaffa-hero h1 { font-size: clamp(40px, 4.4vw, 64px); line-height: .9; }
+.yaffa-hero h1 em { color: var(--label-burgundy); }
+.yaffa-hero p, .yaffa-hero-points, .yaffa-hero-caption span { color: #805c66; }
+.yaffa-hero-actions > span, .yaffa-hero-points svg { color: var(--label-leaf); }
+.market-primary-cta, .button-dark { background: var(--label-burgundy) !important; border-radius: 2px !important; }
+.market-primary-cta:hover, .button-dark:hover { background: #4d1d2b !important; }
+.yaffa-hero-product { background: radial-gradient(circle at 52% 45%, #fdebed, var(--label-paper) 68%); }
+.yaffa-hero-product::before { background: radial-gradient(circle, #efc7d2 0%, #f8dfe5 55%, transparent 70%); }
+.yaffa-jar-lid { background: linear-gradient(#8e3b4c, #6e293a); box-shadow: 0 6px 0 #57202e; }
+.yaffa-jar { background: linear-gradient(145deg, #a94b5f, #6e293a); border: 2px solid rgba(181,138,82,.8); box-shadow: 14px 17px 0 rgba(110,41,58,.12), 0 25px 40px rgba(110,41,58,.22); }
+.yaffa-jar b { color: var(--label-burgundy); background: var(--label-paper); font-family: "Cormorant Garamond", Georgia, serif; }
+.yaffa-jar strong, .yaffa-jar span { font-family: "Cormorant Garamond", Georgia, serif; letter-spacing: .08em; }
+.yaffa-jar strong { font-size: 28px; }
+.yaffa-jar small { color: #f2d8ad; }
+.yaffa-hero-sticker { background: var(--label-gold); color: var(--label-paper); border: 1px solid #8e6a3f; }
+.yaffa-hero-caption { border-left-color: var(--label-gold); background: rgba(255,250,247,.92); }
+.yaffa-hero-caption b { color: var(--label-burgundy); font-family: "Cormorant Garamond", Georgia, serif; font-size: 17px; }
+.yaffa-hero-caption span { color: #805c66; }
+.yaffa-botanical { position: absolute; z-index: 2; left: 8%; bottom: 118px; width: 115px; height: 100px; border-left: 2px solid var(--label-gold); border-radius: 50%; transform: rotate(-28deg); opacity: .85; }
+.yaffa-botanical i { position: absolute; width: 39px; height: 16px; border: 2px solid var(--label-gold); border-radius: 100% 0 100% 0; }
+.yaffa-botanical i:nth-child(1) { top: 8px; left: -9px; transform: rotate(-22deg); }
+.yaffa-botanical i:nth-child(2) { top: 35px; left: -29px; transform: rotate(-45deg); }
+.yaffa-botanical i:nth-child(3) { top: 55px; left: 13px; transform: rotate(17deg); }
+.yaffa-strawberries { position: absolute; z-index: 3; right: 7%; bottom: 123px; display: flex; gap: 0; transform: rotate(-9deg); }
+.strawberry { display: block; font-size: 45px; filter: saturate(.9) drop-shadow(2px 5px 2px rgba(110,41,58,.18)); }
+.strawberry-two { margin: 22px 0 0 -16px; font-size: 34px; transform: rotate(18deg); }
+.product-visual { background: var(--label-pink-light) !important; border-color: rgba(181,138,82,.35) !important; }
+.product-visual .visual-note { color: var(--label-burgundy) !important; }
+.category-circle-art { background: var(--label-pink) !important; color: var(--label-burgundy) !important; border: 1px solid rgba(181,138,82,.4); }
+.market-filter-row button.active { color: var(--label-burgundy); border-color: var(--label-gold); }
+.market-footer { border-top-color: rgba(181,138,82,.4) !important; }
+.footer-social-links a { color: var(--label-burgundy) !important; }
+@media (max-width: 700px) { .yaffa-botanical { left: 3%; bottom: 92px; transform: scale(.72) rotate(-28deg); } .yaffa-strawberries { right: 4%; bottom: 95px; transform: scale(.72) rotate(-9deg); } .yaffa-hero h1 { font-size: 42px; } }
