@@ -3,7 +3,7 @@ import { ArrowLeft, BriefcaseBusiness, LoaderCircle, LogIn, Package, ShieldCheck
 import { trpc } from "@/lib/trpc";
 import { formatCurrency } from "@/lib/store";
 import { startLogin } from "@/const";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const statusLabels: Record<string, string> = {
   pending: "Aguardando confirmação",
@@ -17,15 +17,9 @@ const statusLabels: Record<string, string> = {
 
 export default function Customer() {
   const auth = trpc.auth.me.useQuery();
-  const requestedProfile = typeof window !== "undefined" ? sessionStorage.getItem("puxa-brilha-login-profile") : null;
+  const requestedProfile = typeof window !== "undefined" ? (sessionStorage.getItem("puxa-brilha-login-profile") ?? "customer") : "customer";
   const orders = trpc.customer.orders.useQuery(undefined, { enabled: auth.data?.role === "user" || (auth.data?.role === "admin" && requestedProfile === "customer"), retry: false });
   const [selectedProfile, setSelectedProfile] = useState<string | null>("customer");
-  useEffect(() => {
-    const profile = sessionStorage.getItem("puxa-brilha-login-profile");
-    if (profile === "customer") return;
-    if (auth.data?.role === "admin" || auth.data?.role === "manager") window.location.href = "/admin";
-    if (auth.data?.role === "vendor") window.location.href = "/vendedor";
-  }, [auth.data?.role]);
 
   if (auth.isLoading) return <div className="auth-gate"><LoaderCircle className="auth-spinner" size={26} /><p>Verificando sua conta…</p></div>;
   if (!auth.data) return <main className="customer-page"><header className="customer-header"><Link href="/" className="admin-breadcrumb"><ArrowLeft size={16} /> Voltar à loja</Link><span className="market-logo"><span className="logo-symbol">PB</span><span>Puxa e Brilha</span></span></header><section className="customer-login-card customer-access-card"><div className="customer-login-icon"><LogIn size={24} /></div><span className="eyebrow-small">Acesso Puxa e Brilha</span><h1>Escolha como você vai entrar.</h1><p>Cliente já está selecionado para você entrar ou criar sua conta. Para áreas comerciais, selecione o perfil correspondente.</p><div className="profile-choice-grid"><button type="button" className={selectedProfile === "customer" ? "profile-choice active" : "profile-choice"} onClick={() => setSelectedProfile("customer")}><ShoppingBag size={19} /><span><strong>Cliente</strong><small>Pedidos e compras</small></span></button><button type="button" className={selectedProfile === "representative" ? "profile-choice active" : "profile-choice"} onClick={() => setSelectedProfile("representative")}><Users size={19} /><span><strong>Representante</strong><small>Leads e comissões</small></span></button><button type="button" className={selectedProfile === "vendor" ? "profile-choice active" : "profile-choice"} onClick={() => setSelectedProfile("vendor")}><BriefcaseBusiness size={19} /><span><strong>Vendedor</strong><small>Vendas e indicações</small></span></button><button type="button" className={selectedProfile === "distributor" ? "profile-choice active" : "profile-choice"} onClick={() => setSelectedProfile("distributor")}><Store size={19} /><span><strong>Distribuidor</strong><small>Pedidos e comissões</small></span></button><button type="button" className={selectedProfile === "admin" ? "profile-choice active" : "profile-choice"} onClick={() => setSelectedProfile("admin")}><ShieldCheck size={19} /><span><strong>Administradora</strong><small>Gestão da loja</small></span></button></div><button type="button" className="button button-dark profile-login-button" onClick={() => { sessionStorage.setItem("puxa-brilha-login-profile", selectedProfile ?? "customer"); startLogin(); }}>{selectedProfile === "customer" ? "Entrar ou criar conta" : `Entrar como ${selectedProfile === "admin" ? "administradora" : selectedProfile === "representative" ? "representante" : selectedProfile === "distributor" ? "distribuidor" : "vendedor"}`}</button><Link href="/" className="customer-continue">Continuar comprando sem login <ArrowLeft size={15} /></Link></section></main>;
