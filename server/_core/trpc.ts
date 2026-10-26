@@ -30,7 +30,7 @@ export const protectedProcedure = t.procedure.use(requireUser);
 export const customerProcedure = protectedProcedure.use(
   t.middleware(async opts => {
     const { ctx, next } = opts;
-    if (!ctx.user || ctx.user.role !== "user") {
+    if (!ctx.user || (ctx.user.role !== "user" && ctx.user.role !== "admin")) {
       throw new TRPCError({ code: "FORBIDDEN", message: "Acesso restrito à conta do cliente." });
     }
     return next({ ctx: { ...ctx, user: ctx.user } });
