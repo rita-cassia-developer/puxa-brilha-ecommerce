@@ -27,6 +27,16 @@ const requireUser = t.middleware(async opts => {
 
 export const protectedProcedure = t.procedure.use(requireUser);
 
+export const customerProcedure = protectedProcedure.use(
+  t.middleware(async opts => {
+    const { ctx, next } = opts;
+    if (!ctx.user || ctx.user.role !== "user") {
+      throw new TRPCError({ code: "FORBIDDEN", message: "Acesso restrito à conta do cliente." });
+    }
+    return next({ ctx: { ...ctx, user: ctx.user } });
+  }),
+);
+
 export const adminProcedure = t.procedure.use(
   t.middleware(async opts => {
     const { ctx, next } = opts;
@@ -48,7 +58,7 @@ export const vendorProcedure = t.procedure.use(
   t.middleware(async opts => {
     const { ctx, next } = opts;
     if (!ctx.user || (ctx.user.role !== "vendor" && ctx.user.role !== "admin")) {
-      throw new TRPCError({ code: "FORBIDDEN", message: "Acesso restrito a vendedores." });
+      throw new TRPCError({ code: "FORBIDDEN", message: "Acesso restrito a parceiros cadastrados." });
     }
     return next({ ctx: { ...ctx, user: ctx.user } });
   }),

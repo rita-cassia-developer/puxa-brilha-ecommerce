@@ -1,8 +1,8 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { adminProcedure, publicProcedure, router, vendorProcedure } from "./_core/trpc";
-import { createManualVendor, createOrder, createProduct, deleteProduct, getOrderDetail, getVendorDashboard, listCommissions, listLeads, listOrders, listProducts, listVendors, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
+import { adminProcedure, customerProcedure, publicProcedure, router, vendorProcedure } from "./_core/trpc";
+import { createManualVendor, createOrder, createProduct, deleteProduct, getOrderDetail, getVendorDashboard, listCommissions, listCustomerOrders, listLeads, listOrders, listProducts, listVendors, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
 import { z } from "zod";
 
 const productInput = z.object({
@@ -83,7 +83,7 @@ export const appRouter = router({
       paymentMethod: z.enum(["pix", "card", "boleto", "link"]),
       fulfillment: z.enum(["delivery", "pickup"]),
       referralCode: z.string().trim().max(32).optional(),
-    })).mutation(({ input }) => createOrder(input)),
+    })).mutation(({ input, ctx }) => createOrder(input, ctx.user?.id)),
     list: adminProcedure.query(() => listOrders()),
     detail: adminProcedure.input(z.object({ id: z.number().int().positive() })).query(({ input }) => getOrderDetail(input.id)),
     updateStatus: adminProcedure.input(z.object({
@@ -94,6 +94,10 @@ export const appRouter = router({
       const { id, ...values } = input;
       return updateOrderStatus(id, values);
     }),
+  }),
+
+  customer: router({
+    orders: customerProcedure.query(({ ctx }) => listCustomerOrders(ctx.user.id)),
   }),
 
   referrals: router({

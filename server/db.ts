@@ -159,7 +159,7 @@ function shippingForCep(cep: string) {
   return 29.9;
 }
 
-export async function createOrder(input: CreateOrderInput) {
+export async function createOrder(input: CreateOrderInput, customerUserId?: number) {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
   if (!input.items.length) throw new Error("O carrinho está vazio");
@@ -184,7 +184,7 @@ export async function createOrder(input: CreateOrderInput) {
       paymentMethod: input.paymentMethod, fulfillment: input.fulfillment, customerName: input.customerName.trim(),
       customerEmail: input.customerEmail?.trim() || null, customerPhone: input.customerPhone?.trim() || null,
       addressJson: input.address ? JSON.stringify(input.address) : null,
-      vendorId: referral[0]?.vendorId ?? null, referralCode: referral[0]?.code ?? null,
+      customerUserId: customerUserId ?? null, vendorId: referral[0]?.vendorId ?? null, referralCode: referral[0]?.code ?? null,
     });
     const orderId = Number(inserted[0].insertId);
     await tx.insert(orderItems).values(lines.map(line => ({ orderId, productId: line.product.id, productName: line.product.name, quantity: line.quantity, unitPrice: line.unitPrice.toFixed(2) })));
@@ -205,6 +205,16 @@ export async function listOrders() {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
   return db.select().from(orders).orderBy(desc(orders.createdAt)).limit(100);
+}
+
+export async function listCustomerOrders(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  const customerOrders = await db.select().from(orders).where(eq(orders.customerUserId, userId)).orderBy(desc(orders.createdAt)).limit(100);
+  return Promise.all(customerOrders.map(async order => ({
+    ...order,
+    items: await db.select().from(orderItems).where(eq(orderItems.orderId, order.id)),
+  })));
 }
 
 export async function getOrderDetail(id: number) {
