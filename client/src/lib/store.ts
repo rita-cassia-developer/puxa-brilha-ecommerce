@@ -1,4 +1,4 @@
-export type Category = "Wax";
+export type Category = "Wax" | "TongueDepressor" | "DepilatoryStrips";
 
 export type Product = {
   id: string;
@@ -19,7 +19,7 @@ export type Cart = Record<string, number>;
 const PRODUCTS_KEY = "yaffa-products-v1";
 const CART_KEY = "yaffa-cart-v1";
 
-export const categories: Array<"Todos" | Category> = ["Todos", "Wax"];
+export const categories: Array<"Todos" | Category> = ["Todos", "Wax", "TongueDepressor", "DepilatoryStrips"];
 
 type Seed = Omit<Product, "id" | "category">;
 
@@ -36,6 +36,8 @@ const seeds: Record<Category, Seed[]> = {
       badge: "Produto inicial",
     },
   ],
+  TongueDepressor: [],
+  DepilatoryStrips: [],
 };
 
 export const initialProducts: Product[] = (Object.entries(seeds) as [Category, Seed[]][]).flatMap(([category, products]) => products.map((product, index) => ({ ...product, category, id: `${category.toLowerCase()}-${String(index + 1).padStart(2, "0")}` })));

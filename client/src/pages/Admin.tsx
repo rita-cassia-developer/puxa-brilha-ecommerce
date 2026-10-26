@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 
-const categoryLabels: Record<Exclude<Category, never> | "Todos", string> = { Todos: "Todas", Wax: "Cera de depilação" };
+const categoryLabels: Record<Exclude<Category, never> | "Todos", string> = { Todos: "Todas", Wax: "Cera de depilação", TongueDepressor: "Abaixador de língua", DepilatoryStrips: "Tiras de depilação" };
 
 const emptyForm: Omit<Product, "id"> = {
   name: "",
@@ -83,7 +83,7 @@ export default function Admin() {
   const commissions = commissionsQuery.data ?? [];
   const filteredOrders = statusFilter === "all" ? orders : orders.filter(order => order.orderStatus === statusFilter || order.paymentStatus === statusFilter);
   const products: Product[] = (productsQuery.data ?? []).map(row => ({
-    id: String(row.id), name: row.name, category: "Wax", price: Number(row.price), oldPrice: row.oldPrice == null ? undefined : Number(row.oldPrice),
+    id: String(row.id), name: row.name, category: (row.category as Product["category"]) || "Wax", price: Number(row.price), oldPrice: row.oldPrice == null ? undefined : Number(row.oldPrice),
     badge: row.badge ?? undefined, description: row.description, stock: row.stock, weightKg: row.weightGrams / 1000,
     accent: (row.accent as Product["accent"]) || "rose", note: row.note || "Cera depilatória profissional",
   }));
