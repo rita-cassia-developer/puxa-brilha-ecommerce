@@ -1,8 +1,8 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { adminProcedure, publicProcedure, router } from "./_core/trpc";
-import { createOrder, createProduct, deleteProduct, listCommissions, listLeads, listOrders, listProducts, listVendors, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
+import { adminProcedure, publicProcedure, router, vendorProcedure } from "./_core/trpc";
+import { createManualVendor, createOrder, createProduct, deleteProduct, getOrderDetail, getVendorDashboard, listCommissions, listLeads, listOrders, listProducts, listVendors, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
 import { z } from "zod";
 
 const productInput = z.object({
@@ -85,6 +85,7 @@ export const appRouter = router({
       referralCode: z.string().trim().max(32).optional(),
     })).mutation(({ input }) => createOrder(input)),
     list: adminProcedure.query(() => listOrders()),
+    detail: adminProcedure.input(z.object({ id: z.number().int().positive() })).query(({ input }) => getOrderDetail(input.id)),
     updateStatus: adminProcedure.input(z.object({
       id: z.number().int().positive(),
       paymentStatus: z.enum(["pending", "approved", "rejected", "refunded"]).optional(),
@@ -107,8 +108,10 @@ export const appRouter = router({
 
   partners: router({
     vendors: adminProcedure.query(() => listVendors()),
+    createVendor: adminProcedure.input(z.object({ displayName: z.string().trim().min(2).max(160), email: z.string().email().optional().or(z.literal("")), phone: z.string().max(40).optional(), commissionValue: z.coerce.number().min(0).max(100) })).mutation(({ input }) => createManualVendor(input)),
     leads: adminProcedure.query(() => listLeads()),
     commissions: adminProcedure.query(() => listCommissions()),
+    dashboard: vendorProcedure.query(({ ctx }) => getVendorDashboard(ctx.user.id)),
   }),
 
   // TODO: add feature routers here, e.g.

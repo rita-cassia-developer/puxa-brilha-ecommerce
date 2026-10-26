@@ -207,6 +207,18 @@ export async function listOrders() {
   return db.select().from(orders).orderBy(desc(orders.createdAt)).limit(100);
 }
 
+export async function getOrderDetail(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  const order = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+  if (!order[0]) return null;
+  const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
+  const vendor = order[0].vendorId
+    ? await db.select({ displayName: vendors.displayName, publicCode: vendors.publicCode }).from(vendors).where(eq(vendors.id, order[0].vendorId)).limit(1)
+    : [];
+  return { order: order[0], items, vendor: vendor[0] ?? null };
+}
+
 export async function updateOrderStatus(id: number, input: { paymentStatus?: "pending" | "approved" | "rejected" | "refunded"; orderStatus?: "pending" | "paid" | "processing" | "shipped" | "ready_pickup" | "completed" | "cancelled" }) {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
@@ -221,6 +233,20 @@ export async function listVendors() {
   return db.select().from(vendors).orderBy(asc(vendors.displayName));
 }
 
+export async function createManualVendor(input: { displayName: string; email?: string; phone?: string; commissionValue: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  const cleanName = input.displayName.trim();
+  const publicCode = `YF-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+  const linkCode = `IND-${publicCode}`;
+  const userResult = await db.insert(users).values({ openId: `manual-vendor-${Date.now()}`, name: cleanName, email: input.email?.trim() || null, loginMethod: "manual", role: "vendor" });
+  const userId = Number(userResult[0].insertId);
+  const vendorResult = await db.insert(vendors).values({ userId, displayName: cleanName, publicCode, phone: input.phone?.trim() || null, commissionType: "percentage", commissionValue: input.commissionValue.toFixed(2), status: "active" });
+  const vendorId = Number(vendorResult[0].insertId);
+  await db.insert(referralLinks).values({ vendorId, code: linkCode, status: "active" });
+  return { id: vendorId, displayName: cleanName, publicCode, linkCode };
+}
+
 export async function listLeads() {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
@@ -231,4 +257,18 @@ export async function listCommissions() {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
   return db.select().from(commissions).orderBy(desc(commissions.createdAt)).limit(200);
+}
+
+export async function getVendorDashboard(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  const vendor = await db.select().from(vendors).where(eq(vendors.userId, userId)).limit(1);
+  if (!vendor[0]) return null;
+  const [links, vendorLeads, vendorCommissions, vendorOrders] = await Promise.all([
+    db.select().from(referralLinks).where(eq(referralLinks.vendorId, vendor[0].id)),
+    db.select().from(leads).where(eq(leads.vendorId, vendor[0].id)).orderBy(desc(leads.createdAt)).limit(100),
+    db.select().from(commissions).where(eq(commissions.vendorId, vendor[0].id)).orderBy(desc(commissions.createdAt)).limit(100),
+    db.select().from(orders).where(eq(orders.vendorId, vendor[0].id)).orderBy(desc(orders.createdAt)).limit(100),
+  ]);
+  return { vendor: vendor[0], links, leads: vendorLeads, commissions: vendorCommissions, orders: vendorOrders };
 }
