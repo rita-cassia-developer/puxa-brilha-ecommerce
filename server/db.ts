@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, inArray, like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, orderItems, orders, products, users } from "../drizzle/schema";
+import { InsertUser, leads, orderItems, orders, products, referralLinks, referralVisits, users, vendors } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -46,6 +46,41 @@ export async function getUserByOpenId(openId: string) {
   if (!db) return undefined;
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
   return result[0];
+}
+
+export async function seedDummyVendors(productId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  const seeds = [
+    { openId: "dummy-vendor-ana", name: "Ana Souza (Teste)", email: "ana.teste@yaffa.local", displayName: "Ana Souza (Vendedora teste)", publicCode: "TESTE-ANA", linkCode: "IND-ANA-TESTE" },
+    { openId: "dummy-vendor-bruno", name: "Bruno Lima (Teste)", email: "bruno.teste@yaffa.local", displayName: "Bruno Lima (Vendedor teste)", publicCode: "TESTE-BRUNO", linkCode: "IND-BRUNO-TESTE" },
+    { openId: "dummy-vendor-carla", name: "Carla Mendes (Teste)", email: "carla.teste@yaffa.local", displayName: "Carla Mendes (Vendedora teste)", publicCode: "TESTE-CARLA", linkCode: "IND-CARLA-TESTE" },
+  ];
+  const result: Array<{ displayName: string; publicCode: string; linkCode: string }> = [];
+  for (const seed of seeds) {
+    await db.insert(users).values({ openId: seed.openId, name: seed.name, email: seed.email, loginMethod: "dummy", role: "vendor" }).onDuplicateKeyUpdate({ set: { name: seed.name, email: seed.email, role: "vendor" } });
+    const user = await db.select({ id: users.id }).from(users).where(eq(users.openId, seed.openId)).limit(1);
+    if (!user[0]) continue;
+    await db.insert(vendors).values({ userId: user[0].id, publicCode: seed.publicCode, displayName: seed.displayName, commissionType: "percentage", commissionValue: "5.00", status: "active" }).onDuplicateKeyUpdate({ set: { displayName: seed.displayName, status: "active" } });
+    const vendor = await db.select({ id: vendors.id }).from(vendors).where(eq(vendors.publicCode, seed.publicCode)).limit(1);
+    if (!vendor[0]) continue;
+    await db.insert(referralLinks).values({ vendorId: vendor[0].id, code: seed.linkCode, productId: productId ?? null, status: "active" }).onDuplicateKeyUpdate({ set: { status: "active", productId: productId ?? null } });
+    result.push({ displayName: seed.displayName, publicCode: seed.publicCode, linkCode: seed.linkCode });
+  }
+  return result;
+}
+
+export async function registerReferralVisit(input: { code: string; sessionId: string; productId?: number; landingPath?: string; userAgent?: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  const link = await db.select().from(referralLinks).where(and(eq(referralLinks.code, input.code), eq(referralLinks.status, "active"))).limit(1);
+  if (!link[0]) return { tracked: false as const };
+  const vendorId = link[0].vendorId;
+  await db.insert(referralVisits).values({ vendorId, referralLinkId: link[0].id, sessionId: input.sessionId, productId: input.productId ?? link[0].productId ?? null, landingPath: input.landingPath ?? "/", userAgent: input.userAgent ?? null });
+  const existingLead = await db.select({ id: leads.id }).from(leads).where(and(eq(leads.vendorId, vendorId), eq(leads.sessionId, input.sessionId))).limit(1);
+  if (!existingLead[0]) await db.insert(leads).values({ vendorId, sessionId: input.sessionId, source: input.code, status: "new" });
+  const vendor = await db.select({ displayName: vendors.displayName, publicCode: vendors.publicCode }).from(vendors).where(eq(vendors.id, vendorId)).limit(1);
+  return { tracked: true as const, vendor: vendor[0] ?? null, code: input.code };
 }
 
 export type ProductRecord = typeof products.$inferSelect;
@@ -111,6 +146,7 @@ type CreateOrderInput = {
   cep?: string;
   paymentMethod: "pix" | "card" | "boleto" | "link";
   fulfillment: "delivery" | "pickup";
+  referralCode?: string;
 };
 
 function shippingForCep(cep: string) {
@@ -140,6 +176,7 @@ export async function createOrder(input: CreateOrderInput) {
   const subtotal = lines.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0);
   const shipping = input.fulfillment === "pickup" ? 0 : shippingForCep(input.cep ?? "");
   const total = subtotal + shipping;
+  const referral = input.referralCode ? await db.select({ vendorId: referralLinks.vendorId, code: referralLinks.code }).from(referralLinks).where(and(eq(referralLinks.code, input.referralCode), eq(referralLinks.status, "active"))).limit(1) : [];
   const code = `YF-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
   const result = await db.transaction(async tx => {
     const inserted = await tx.insert(orders).values({
@@ -147,6 +184,7 @@ export async function createOrder(input: CreateOrderInput) {
       paymentMethod: input.paymentMethod, fulfillment: input.fulfillment, customerName: input.customerName.trim(),
       customerEmail: input.customerEmail?.trim() || null, customerPhone: input.customerPhone?.trim() || null,
       addressJson: input.address ? JSON.stringify(input.address) : null,
+      vendorId: referral[0]?.vendorId ?? null, referralCode: referral[0]?.code ?? null,
     });
     const orderId = Number(inserted[0].insertId);
     await tx.insert(orderItems).values(lines.map(line => ({ orderId, productId: line.product.id, productName: line.product.name, quantity: line.quantity, unitPrice: line.unitPrice.toFixed(2) })));

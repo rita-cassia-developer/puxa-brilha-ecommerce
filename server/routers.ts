@@ -2,7 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, publicProcedure, router } from "./_core/trpc";
-import { createOrder, createProduct, deleteProduct, listOrders, listProducts, updateOrderStatus, updateProduct } from "./db";
+import { createOrder, createProduct, deleteProduct, listOrders, listProducts, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
 import { z } from "zod";
 
 const productInput = z.object({
@@ -82,6 +82,7 @@ export const appRouter = router({
       cep: z.string().optional(),
       paymentMethod: z.enum(["pix", "card", "boleto", "link"]),
       fulfillment: z.enum(["delivery", "pickup"]),
+      referralCode: z.string().trim().max(32).optional(),
     })).mutation(({ input }) => createOrder(input)),
     list: adminProcedure.query(() => listOrders()),
     updateStatus: adminProcedure.input(z.object({
@@ -92,6 +93,16 @@ export const appRouter = router({
       const { id, ...values } = input;
       return updateOrderStatus(id, values);
     }),
+  }),
+
+  referrals: router({
+    visit: publicProcedure.input(z.object({
+      code: z.string().trim().min(3).max(32),
+      sessionId: z.string().trim().min(8).max(128),
+      productId: z.coerce.number().int().positive().optional(),
+      landingPath: z.string().max(500).optional(),
+      userAgent: z.string().max(500).optional(),
+    })).mutation(({ input }) => registerReferralVisit(input)),
   }),
 
   // TODO: add feature routers here, e.g.

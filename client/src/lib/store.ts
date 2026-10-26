@@ -79,10 +79,10 @@ export function calculateShipping(cep: string) {
   const digits = cep.replace(/\D/g, "");
   if (digits.length !== 8) return null;
   const prefix = Number(digits.slice(0, 2));
-  if (prefix <= 19) return { price: 12.9, days: "3 a 5 dias úteis", label: "Sudeste" };
-  if (prefix <= 49) return { price: 18.9, days: "5 a 7 dias úteis", label: "Centro-Oeste / Nordeste" };
-  if (prefix <= 79) return { price: 24.9, days: "6 a 9 dias úteis", label: "Norte / Nordeste" };
-  return { price: 29.9, days: "7 a 10 dias úteis", label: "Demais regiões" };
+  if (prefix <= 19) return { price: 12.9, days: "Até 7 dias úteis", label: "Sudeste" };
+  if (prefix <= 49) return { price: 18.9, days: "Até 7 dias úteis", label: "Centro-Oeste / Nordeste" };
+  if (prefix <= 79) return { price: 24.9, days: "Até 7 dias úteis", label: "Norte / Nordeste" };
+  return { price: 29.9, days: "Até 7 dias úteis", label: "Demais regiões" };
 }
 
 export function createOrderCode() {
