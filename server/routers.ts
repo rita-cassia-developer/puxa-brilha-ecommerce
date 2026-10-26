@@ -2,7 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, publicProcedure, router } from "./_core/trpc";
-import { createOrder, createProduct, deleteProduct, listOrders, listProducts, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
+import { createOrder, createProduct, deleteProduct, listCommissions, listLeads, listOrders, listProducts, listVendors, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
 import { z } from "zod";
 
 const productInput = z.object({
@@ -103,6 +103,12 @@ export const appRouter = router({
       landingPath: z.string().max(500).optional(),
       userAgent: z.string().max(500).optional(),
     })).mutation(({ input }) => registerReferralVisit(input)),
+  }),
+
+  partners: router({
+    vendors: adminProcedure.query(() => listVendors()),
+    leads: adminProcedure.query(() => listLeads()),
+    commissions: adminProcedure.query(() => listCommissions()),
   }),
 
   // TODO: add feature routers here, e.g.

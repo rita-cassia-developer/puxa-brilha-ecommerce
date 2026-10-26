@@ -490,3 +490,16 @@ body, .marketplace { background: var(--label-paper) !important; }
 .orders-filter { padding: 8px 10px; }
 .order-status-select { display: block; margin-top: 5px; padding: 4px 5px; font-size: 10px; }
 @media (max-width: 650px) { .orders-head-actions { align-items: flex-start; flex-direction: column; gap: 8px; } .orders-filter { width: 100%; } }
+
+.partner-dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 28px; }
+.partner-panel { border: 1px solid rgba(181,138,82,.25); background: #fffaf7; padding: 20px; min-height: 190px; }
+.partner-panel-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 16px; }
+.partner-panel h2 { margin: 4px 0 0; font-size: 20px; color: #6e293a; }
+.partner-panel h2 span { color: #b58a52; }
+.test-badge { color: #8e6a3f; border: 1px solid rgba(181,138,82,.4); padding: 5px 7px; font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+.partner-row { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 10px; padding: 11px 0; border-top: 1px solid rgba(181,138,82,.16); }
+.partner-avatar { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #ead0d5; color: #6e293a; font-size: 12px; font-weight: 800; }
+.partner-avatar.lead { background: #e7dcc2; color: #8e6a3f; }.partner-avatar.commission { background: #dce5d7; color: #668e5a; }
+.partner-row div:nth-child(2) { display: grid; gap: 3px; min-width: 0; }.partner-row strong { color: #6e293a; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.partner-row small { color: #8c7078; font-size: 9px; }
+.partner-active, .lead-status { color: #668e5a; font-size: 9px; font-weight: 700; }.lead-status { color: #8e6a3f; }.commission-value { color: #668e5a; font-size: 11px; }.partner-empty { color: #8c7078; font-size: 11px; padding: 20px 0; }
+@media (max-width: 1050px) { .partner-dashboard-grid { grid-template-columns: 1fr; } }

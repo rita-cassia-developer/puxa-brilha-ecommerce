@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, inArray, like } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, leads, orderItems, orders, products, referralLinks, referralVisits, users, vendors } from "../drizzle/schema";
+import { InsertUser, commissions, leads, orderItems, orders, products, referralLinks, referralVisits, users, vendors } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -188,6 +188,14 @@ export async function createOrder(input: CreateOrderInput) {
     });
     const orderId = Number(inserted[0].insertId);
     await tx.insert(orderItems).values(lines.map(line => ({ orderId, productId: line.product.id, productName: line.product.name, quantity: line.quantity, unitPrice: line.unitPrice.toFixed(2) })));
+    if (referral[0] && subtotal > 0) {
+      const vendor = await tx.select({ commissionType: vendors.commissionType, commissionValue: vendors.commissionValue }).from(vendors).where(eq(vendors.id, referral[0].vendorId)).limit(1);
+      if (vendor[0]) {
+        const rate = Number(vendor[0].commissionValue);
+        const amount = vendor[0].commissionType === "fixed" ? rate : subtotal * rate / 100;
+        await tx.insert(commissions).values({ vendorId: referral[0].vendorId, orderId, amount: amount.toFixed(2), status: "pending" });
+      }
+    }
     return orderId;
   });
   return { id: result, code, subtotal, shipping, total };
@@ -205,4 +213,22 @@ export async function updateOrderStatus(id: number, input: { paymentStatus?: "pe
   await db.update(orders).set(input).where(eq(orders.id, id));
   const rows = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
   return rows[0];
+}
+
+export async function listVendors() {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  return db.select().from(vendors).orderBy(asc(vendors.displayName));
+}
+
+export async function listLeads() {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  return db.select().from(leads).orderBy(desc(leads.createdAt)).limit(200);
+}
+
+export async function listCommissions() {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  return db.select().from(commissions).orderBy(desc(commissions.createdAt)).limit(200);
 }
