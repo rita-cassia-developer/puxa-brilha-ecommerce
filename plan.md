@@ -1,4 +1,4 @@
-# Plano — Lumera Marketplace de Cosméticos
+# Plano — Puxa e Brilha Marketplace de Cosméticos
 
 ## Atualização de direção
 A experiência foi reposicionada de boutique editorial para marketplace de grande escala, inspirada nos padrões de descoberta e conversão de grandes e-commerces globais, sem copiar marcas: busca central protagonista, navegação por categorias, oferta em destaque, filtros, ordenação, cards comerciais e confiança visível.
@@ -19,7 +19,7 @@ Troca da serif editorial por uma sans-serif de interface (Inter/Arial fallback),
 - Hero promocional com oferta, CTA primário e promessa de frete.
 - Faixa de benefícios para reduzir insegurança.
 - Categorias visuais, filtros, ordenação, cards com avaliação, vendidos, desconto, parcelamento e ação de compra; o catálogo inicial contém no mínimo 10 produtos em cada categoria (Rosto, Corpo, Cabelos, Fragrâncias e Maquiagem), incluindo batons pesquisáveis.
-- Checkout simulado com escolha entre receber em casa ou retirar na loja; entrega calcula frete pelo CEP, enquanto retirada informa a unidade Lumera, zera o frete e indica prazo de preparo. O pagamento oferece opções clicáveis de Pix, cartão de crédito e boleto, campos de cartão apenas demonstrativos e confirmação explícita.
+- Checkout simulado com escolha entre receber em casa ou retirar na loja; entrega calcula frete pelo CEP, enquanto retirada informa a unidade Puxa e Brilha, zera o frete e indica prazo de preparo. O pagamento oferece opções clicáveis de Pix, cartão de crédito e boleto, campos de cartão apenas demonstrativos e confirmação explícita.
 - Painel `/admin` com CRUD local: adicionar, editar, remover, preço, estoque, categoria, selo, nota e descrição. Alterações ficam persistidas no navegador e aparecem na vitrine.
 
 ## Robustez de demonstração

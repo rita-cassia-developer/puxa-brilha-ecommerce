@@ -16,8 +16,8 @@ export type Product = {
 
 export type Cart = Record<string, number>;
 
-const PRODUCTS_KEY = "yaffa-products-v1";
-const CART_KEY = "yaffa-cart-v1";
+const PRODUCTS_KEY = "puxa-e-brilha-products-v1";
+const CART_KEY = "puxa-e-brilha-cart-v1";
 
 export const categories: Array<"Todos" | Category> = ["Todos", "Wax", "TongueDepressor", "DepilatoryStrips"];
 
@@ -26,13 +26,13 @@ type Seed = Omit<Product, "id" | "category">;
 const seeds: Record<Category, Seed[]> = {
   Wax: [
     {
-      name: "Yaffa — Cera de Morango",
-      description: "Cera depilatória profissional com aroma de morango, ideal para clínicas de depilação e depiladoras profissionais.",
+      name: "Puxa e Brilha — Cera de Morango",
+      description: "Cera de morango que deixa a pele lisa e brilhosa, ideal para clínicas e profissionais de beleza.",
       price: 0,
       weightKg: 1.4,
       stock: 0,
       accent: "rose",
-      note: "Cera depilatória profissional",
+      note: "Cera de morango para uma pele lisa e brilhosa",
       badge: "Produto inicial",
     },
   ],
@@ -60,7 +60,7 @@ export function loadProducts(): Product[] {
 export function saveProducts(products: Product[]) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
-  window.dispatchEvent(new CustomEvent("yaffa-products-updated"));
+  window.dispatchEvent(new CustomEvent("puxa-e-brilha-products-updated"));
 }
 
 export function loadCart(): Cart {

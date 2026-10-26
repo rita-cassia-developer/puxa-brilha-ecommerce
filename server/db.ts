@@ -52,9 +52,9 @@ export async function seedDummyVendors(productId?: number) {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
   const seeds = [
-    { openId: "dummy-vendor-ana", name: "Ana Souza (Teste)", email: "ana.teste@yaffa.local", displayName: "Ana Souza (Vendedora teste)", publicCode: "TESTE-ANA", linkCode: "IND-ANA-TESTE" },
-    { openId: "dummy-vendor-bruno", name: "Bruno Lima (Teste)", email: "bruno.teste@yaffa.local", displayName: "Bruno Lima (Vendedor teste)", publicCode: "TESTE-BRUNO", linkCode: "IND-BRUNO-TESTE" },
-    { openId: "dummy-vendor-carla", name: "Carla Mendes (Teste)", email: "carla.teste@yaffa.local", displayName: "Carla Mendes (Vendedora teste)", publicCode: "TESTE-CARLA", linkCode: "IND-CARLA-TESTE" },
+    { openId: "dummy-vendor-ana", name: "Ana Souza (Teste)", email: "ana.teste@puxaebrilha.local", displayName: "Ana Souza (Vendedora teste)", publicCode: "TESTE-ANA", linkCode: "IND-ANA-TESTE" },
+    { openId: "dummy-vendor-bruno", name: "Bruno Lima (Teste)", email: "bruno.teste@puxaebrilha.local", displayName: "Bruno Lima (Vendedor teste)", publicCode: "TESTE-BRUNO", linkCode: "IND-BRUNO-TESTE" },
+    { openId: "dummy-vendor-carla", name: "Carla Mendes (Teste)", email: "carla.teste@puxaebrilha.local", displayName: "Carla Mendes (Vendedora teste)", publicCode: "TESTE-CARLA", linkCode: "IND-CARLA-TESTE" },
   ];
   const result: Array<{ displayName: string; publicCode: string; linkCode: string }> = [];
   for (const seed of seeds) {
@@ -122,13 +122,13 @@ export async function deleteProduct(id: number) {
 export async function seedInitialProduct() {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
-  const existing = await db.select({ id: products.id }).from(products).where(eq(products.slug, "yaffa-cera-de-morango")).limit(1);
+  const existing = await db.select({ id: products.id }).from(products).where(eq(products.slug, "puxa-e-brilha-cera-de-morango")).limit(1);
   if (existing.length > 0) return existing[0].id;
   const result = await db.insert(products).values({
-    name: "Yaffa — Cera de Morango",
-    slug: "yaffa-cera-de-morango",
+    name: "Puxa e Brilha — Cera de Morango",
+    slug: "puxa-e-brilha-cera-de-morango",
     category: "Wax",
-    description: "Cera depilatória profissional com aroma de morango, ideal para clínicas de depilação e depiladoras profissionais.",
+    description: "Cera de morango que deixa a pele lisa e brilhosa, ideal para clínicas e profissionais de beleza.",
     price: "0.00",
     stock: 0,
     weightGrams: 1400,

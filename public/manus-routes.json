@@ -1,1 +1,1 @@
-{"routes":[{"path":"/","title":"Lumera — Cosméticos Essenciais"},{"path":"/admin","title":"Lumera Studio — Produtos"},{"path":"/vendedor","title":"Yaffa — Portal do vendedor"},{"path":"/legal/:page","title":"Yaffa — Informações institucionais"}]}
+{"routes":[{"path":"/","title":"Puxa e Brilha — Cosméticos Essenciais"},{"path":"/admin","title":"Puxa e Brilha Studio — Produtos"},{"path":"/vendedor","title":"Puxa e Brilha — Portal do vendedor"},{"path":"/legal/:page","title":"Puxa e Brilha — Informações institucionais"}]}

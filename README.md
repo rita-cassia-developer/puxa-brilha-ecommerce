@@ -1,4 +1,4 @@
-# Lumera — Cosméticos Essenciais
+# Puxa e Brilha — Cosméticos Essenciais
 
 React / Express / tRPC / Drizzle starter, adapted from the Sandbox web-db-user template.
 
