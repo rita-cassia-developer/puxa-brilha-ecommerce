@@ -21,6 +21,11 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   if (!user.openId) throw new Error("User openId is required for upsert");
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
+  const existingByEmail = user.email ? await db.select().from(users).where(eq(users.email, user.email)).limit(1) : [];
+  if (existingByEmail[0] && existingByEmail[0].openId !== user.openId && existingByEmail[0].role === "vendor" && !user.role) {
+    await db.update(users).set({ openId: user.openId, name: user.name ?? existingByEmail[0].name, loginMethod: user.loginMethod ?? existingByEmail[0].loginMethod, lastSignedIn: user.lastSignedIn ?? new Date() }).where(eq(users.id, existingByEmail[0].id));
+    return;
+  }
   const values: InsertUser = { openId: user.openId };
   const updateSet: Record<string, unknown> = {};
   const textFields = ["name", "email", "loginMethod"] as const;
