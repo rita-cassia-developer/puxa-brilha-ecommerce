@@ -1,1 +1,1 @@
-{"routes":[{"path":"/","title":"Lumera — Cosméticos Essenciais"},{"path":"/admin","title":"Lumera Studio — Produtos"},{"path":"/vendedor","title":"Yaffa — Portal do vendedor"}]}
+{"routes":[{"path":"/","title":"Lumera — Cosméticos Essenciais"},{"path":"/admin","title":"Lumera Studio — Produtos"},{"path":"/vendedor","title":"Yaffa — Portal do vendedor"},{"path":"/legal/:page","title":"Yaffa — Informações institucionais"}]}
