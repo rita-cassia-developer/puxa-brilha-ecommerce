@@ -37,6 +37,7 @@ export const vendors = mysqlTable("vendors", {
   publicCode: varchar("publicCode", { length: 32 }).notNull().unique(),
   displayName: varchar("displayName", { length: 160 }).notNull(),
   phone: varchar("phone", { length: 40 }),
+  partnerType: mysqlEnum("partnerType", ["representative", "vendor", "distributor"]).default("vendor").notNull(),
   commissionType: mysqlEnum("commissionType", ["percentage", "fixed"]).default("percentage").notNull(),
   commissionValue: decimal("commissionValue", { precision: 10, scale: 2 }).default("0").notNull(),
   status: mysqlEnum("status", ["pending", "active", "blocked"]).default("pending").notNull(),

@@ -61,7 +61,7 @@ export async function seedDummyVendors(productId?: number) {
     await db.insert(users).values({ openId: seed.openId, name: seed.name, email: seed.email, loginMethod: "dummy", role: "vendor" }).onDuplicateKeyUpdate({ set: { name: seed.name, email: seed.email, role: "vendor" } });
     const user = await db.select({ id: users.id }).from(users).where(eq(users.openId, seed.openId)).limit(1);
     if (!user[0]) continue;
-    await db.insert(vendors).values({ userId: user[0].id, publicCode: seed.publicCode, displayName: seed.displayName, commissionType: "percentage", commissionValue: "5.00", status: "active" }).onDuplicateKeyUpdate({ set: { displayName: seed.displayName, status: "active" } });
+    await db.insert(vendors).values({ userId: user[0].id, publicCode: seed.publicCode, displayName: seed.displayName, partnerType: "vendor", commissionType: "percentage", commissionValue: "5.00", status: "active" }).onDuplicateKeyUpdate({ set: { displayName: seed.displayName, partnerType: "vendor", status: "active" } });
     const vendor = await db.select({ id: vendors.id }).from(vendors).where(eq(vendors.publicCode, seed.publicCode)).limit(1);
     if (!vendor[0]) continue;
     await db.insert(referralLinks).values({ vendorId: vendor[0].id, code: seed.linkCode, productId: productId ?? null, status: "active" }).onDuplicateKeyUpdate({ set: { status: "active", productId: productId ?? null } });
@@ -132,7 +132,7 @@ export async function seedInitialProduct() {
     price: "0.00",
     stock: 0,
     weightGrams: 1400,
-    status: "active",
+    status: "draft",
   });
   return Number(result[0].insertId);
 }
@@ -177,7 +177,7 @@ export async function createOrder(input: CreateOrderInput) {
   const shipping = input.fulfillment === "pickup" ? 0 : shippingForCep(input.cep ?? "");
   const total = subtotal + shipping;
   const referral = input.referralCode ? await db.select({ vendorId: referralLinks.vendorId, code: referralLinks.code }).from(referralLinks).where(and(eq(referralLinks.code, input.referralCode), eq(referralLinks.status, "active"))).limit(1) : [];
-  const code = `YF-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+  const code = `PB-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
   const result = await db.transaction(async tx => {
     const inserted = await tx.insert(orders).values({
       code, subtotal: subtotal.toFixed(2), shipping: shipping.toFixed(2), total: total.toFixed(2),
@@ -233,7 +233,7 @@ export async function listVendors() {
   return db.select().from(vendors).orderBy(asc(vendors.displayName));
 }
 
-export async function createManualVendor(input: { displayName: string; email?: string; phone?: string; commissionValue: number }) {
+export async function createManualVendor(input: { displayName: string; email?: string; phone?: string; partnerType: "representative" | "vendor" | "distributor"; commissionValue: number }) {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
   const cleanName = input.displayName.trim();
@@ -241,7 +241,7 @@ export async function createManualVendor(input: { displayName: string; email?: s
   const linkCode = `IND-${publicCode}`;
   const userResult = await db.insert(users).values({ openId: `manual-vendor-${Date.now()}`, name: cleanName, email: input.email?.trim() || null, loginMethod: "manual", role: "vendor" });
   const userId = Number(userResult[0].insertId);
-  const vendorResult = await db.insert(vendors).values({ userId, displayName: cleanName, publicCode, phone: input.phone?.trim() || null, commissionType: "percentage", commissionValue: input.commissionValue.toFixed(2), status: "active" });
+  const vendorResult = await db.insert(vendors).values({ userId, displayName: cleanName, publicCode, phone: input.phone?.trim() || null, partnerType: input.partnerType, commissionType: "percentage", commissionValue: input.commissionValue.toFixed(2), status: "active" });
   const vendorId = Number(vendorResult[0].insertId);
   await db.insert(referralLinks).values({ vendorId, code: linkCode, status: "active" });
   return { id: vendorId, displayName: cleanName, publicCode, linkCode };

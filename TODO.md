@@ -29,3 +29,9 @@
 - Em celulares, a loja deve manter o acesso “Área administrativa” visível no canto superior direito, junto do carrinho.
 - O botão de menu sanduíche deve abrir e fechar um menu funcional com categorias e atalho para o painel administrativo.
 - A vitrine e o checkout devem se ajustar a telas pequenas sem cortar controles essenciais ou exigir rolagem horizontal.
+
+## Atualização solicitada pela cliente — catálogo e parceiros
+- O catálogo público pode permanecer sem produtos enquanto os itens reais estão em produção; o produto demonstrativo existente foi mantido como rascunho, com preço zero e sem exibição na vitrine.
+- O painel administrativo deve permitir o cadastro manual de parceiros com nome, e-mail, WhatsApp, tipo de parceiro e comissão.
+- Os tipos de parceiro disponíveis são Representante, Vendedor e Distribuidor; todos recebem identificação própria, link de indicação, leads, pedidos e comissões no banco.
+- A proprietária poderá cadastrar os produtos reais posteriormente, incluindo foto, preço, peso, estoque, descrição e categoria.

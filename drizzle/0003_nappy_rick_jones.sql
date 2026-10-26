@@ -1,0 +1,1 @@
+ALTER TABLE `vendors` ADD `partnerType` enum('representative','vendor','distributor') DEFAULT 'vendor' NOT NULL;

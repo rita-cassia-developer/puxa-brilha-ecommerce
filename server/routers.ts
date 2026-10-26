@@ -108,7 +108,7 @@ export const appRouter = router({
 
   partners: router({
     vendors: adminProcedure.query(() => listVendors()),
-    createVendor: adminProcedure.input(z.object({ displayName: z.string().trim().min(2).max(160), email: z.string().email().optional().or(z.literal("")), phone: z.string().max(40).optional(), commissionValue: z.coerce.number().min(0).max(100) })).mutation(({ input }) => createManualVendor(input)),
+    createVendor: adminProcedure.input(z.object({ displayName: z.string().trim().min(2).max(160), email: z.string().email().optional().or(z.literal("")), phone: z.string().max(40).optional(), partnerType: z.enum(["representative", "vendor", "distributor"]).default("vendor"), commissionValue: z.coerce.number().min(0).max(100) })).mutation(({ input }) => createManualVendor(input)),
     leads: adminProcedure.query(() => listLeads()),
     commissions: adminProcedure.query(() => listCommissions()),
     dashboard: vendorProcedure.query(({ ctx }) => getVendorDashboard(ctx.user.id)),
