@@ -17,7 +17,7 @@
   --sand: #f1d9dc;
   --white: #fffefa;
   --radius: 3px;
-  font-family: "DM Sans", sans-serif;
+  font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--ink);
   background: var(--paper);
   font-synthesis: none;
@@ -589,3 +589,11 @@ html, body, button, input, textarea, select { font-family: Inter, "Segoe UI", Ro
 .customer-access-card { width:min(680px,calc(100% - 28px)); }.customer-access-card > p { max-width:520px; margin-left:auto; margin-right:auto; }.profile-choice-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:26px 0 18px; text-align:left; }.profile-choice { display:flex; align-items:center; gap:11px; min-height:70px; padding:13px; border:1px solid #efd5dc; background:#fffafa; color:var(--pb-magenta); cursor:pointer; text-align:left; transition:all .18s ease; }.profile-choice:hover,.profile-choice.active { border-color:var(--pb-magenta); background:#fff0f5; box-shadow:0 5px 14px rgba(116,10,58,.08); }.profile-choice > span { display:block; }.profile-choice strong,.profile-choice small { display:block; }.profile-choice strong { color:var(--pb-deep); font-size:13px; }.profile-choice small { margin-top:4px; color:#8f6c7a; font-size:11px; }.profile-login-button { width:100%; }.profile-login-button:disabled { opacity:.6; cursor:not-allowed; }
 @media(max-width:560px){.profile-choice-grid{grid-template-columns:1fr}.customer-access-card{padding:28px 18px}.partner-head-actions{flex-wrap:wrap;justify-content:flex-end}.partner-head-actions .test-badge{font-size:9px}}
 .auth-gate-link { display:block; margin-top:16px; color:var(--pb-magenta); font-size:12px; font-weight:800; text-decoration:none; text-align:center; }.auth-gate-link:hover { text-decoration:underline; }
+
+/* Sistema tipográfico unificado — uma única família para uma experiência limpa de marketplace. */
+:root { --font-primary: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+*, *::before, *::after { font-family: var(--font-primary) !important; }
+body { font-family: var(--font-primary) !important; }
+h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
+.market-logo, .admin-logo, .vendor-brand, .wordmark { font-weight: 800; letter-spacing: -0.045em; }
+.market-overline, .puxa-brilha-eyebrow, .eyebrow, .eyebrow-small, .market-product-category, .admin-nav-label, .table-head { font-weight: 700; letter-spacing: .12em; }
