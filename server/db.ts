@@ -242,6 +242,17 @@ export async function updateOrderStatus(id: number, input: { paymentStatus?: "pe
   return rows[0];
 }
 
+export async function deleteOrder(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  await db.transaction(async tx => {
+    await tx.delete(commissions).where(eq(commissions.orderId, id));
+    await tx.delete(orderItems).where(eq(orderItems.orderId, id));
+    await tx.delete(orders).where(eq(orders.id, id));
+  });
+  return { id };
+}
+
 export async function listVendors() {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");

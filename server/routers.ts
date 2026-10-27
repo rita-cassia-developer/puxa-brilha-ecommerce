@@ -2,7 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, customerProcedure, publicProcedure, router, vendorProcedure } from "./_core/trpc";
-import { createManualVendor, createOrder, createProduct, deleteProduct, getOrderDetail, getVendorDashboard, listCommissions, listCustomerOrders, listLeads, listOrders, listProducts, listVendors, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
+import { createManualVendor, createOrder, createProduct, deleteOrder, deleteProduct, getOrderDetail, getVendorDashboard, listCommissions, listCustomerOrders, listLeads, listOrders, listProducts, listVendors, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
 import { z } from "zod";
 
 const productInput = z.object({
@@ -94,6 +94,7 @@ export const appRouter = router({
       const { id, ...values } = input;
       return updateOrderStatus(id, values);
     }),
+    remove: adminProcedure.input(z.object({ id: z.number().int().positive() })).mutation(({ input }) => deleteOrder(input.id)),
   }),
 
   customer: router({

@@ -653,3 +653,10 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
 .category-circle-art { overflow:hidden; display:grid; place-items:center; }
 .category-circle-art img { width:82%; height:82%; object-fit:contain; display:block; filter:drop-shadow(0 7px 8px rgba(130,20,65,.14)); }
 .category-circle-art.offer img { width:78%; height:78%; }
+
+/* Ações administrativas dos pedidos. */
+.order-admin-actions { display:flex; align-items:center; gap:6px; margin-top:8px; grid-column:1 / -1; }
+.order-admin-actions button { display:inline-flex; align-items:center; gap:4px; border:1px solid #e8c9d4; border-radius:6px; background:#fff; color:#72213e; padding:6px 8px; font:600 10px Inter, sans-serif; cursor:pointer; }
+.order-admin-actions button:hover { background:#fff0f5; border-color:#c51a55; }
+.order-admin-actions button.danger { color:#a5163e; border-color:#edb4c4; }
+.order-admin-actions button:disabled { opacity:.5; cursor:not-allowed; }
