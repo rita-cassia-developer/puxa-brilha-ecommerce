@@ -648,3 +648,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
 .category-nav a.active { color:var(--pb-magenta) !important; font-weight:800; }
 .category-nav a.active::after { content:""; position:absolute; left:0; right:0; bottom:2px; height:3px; border-radius:999px; background:var(--pb-magenta); }
 @media(max-width:700px){ .category-menu.active { color:#fff !important; } .category-nav a.active::after { bottom:0; } }
+
+/* Ilustrações dos cards de categoria — substituem os marcadores genéricos. */
+.category-circle-art { overflow:hidden; display:grid; place-items:center; }
+.category-circle-art img { width:82%; height:82%; object-fit:contain; display:block; filter:drop-shadow(0 7px 8px rgba(130,20,65,.14)); }
+.category-circle-art.offer img { width:78%; height:78%; }
