@@ -256,7 +256,31 @@ export async function deleteOrder(id: number) {
 export async function listVendors() {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
-  return db.select().from(vendors).orderBy(asc(vendors.displayName));
+  const rows = await db.select().from(vendors).orderBy(asc(vendors.displayName));
+  return Promise.all(rows.map(async vendor => {
+    const link = await db.select({ code: referralLinks.code }).from(referralLinks).where(and(eq(referralLinks.vendorId, vendor.id), eq(referralLinks.status, "active"))).limit(1);
+    return { ...vendor, referralCode: link[0]?.code ?? null };
+  }));
+}
+
+export async function ensureReferralLink(vendorId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  const vendor = await db.select({ id: vendors.id, publicCode: vendors.publicCode }).from(vendors).where(eq(vendors.id, vendorId)).limit(1);
+  if (!vendor[0]) throw new Error("Parceiro não encontrado");
+  const existing = await db.select({ code: referralLinks.code }).from(referralLinks).where(and(eq(referralLinks.vendorId, vendorId), eq(referralLinks.status, "active"))).limit(1);
+  if (existing[0]) return existing[0];
+  const code = `IND-${vendor[0].publicCode}-${Date.now().toString(36).toUpperCase().slice(-4)}`.slice(0, 32);
+  await db.insert(referralLinks).values({ vendorId, code, status: "active" });
+  return { code };
+}
+
+export async function ensureOwnReferralLink(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  const vendor = await db.select({ id: vendors.id }).from(vendors).where(eq(vendors.userId, userId)).limit(1);
+  if (!vendor[0]) throw new Error("Perfil de parceiro não encontrado");
+  return ensureReferralLink(vendor[0].id);
 }
 
 export async function createManualVendor(input: { displayName: string; email?: string; phone?: string; partnerType: "representative" | "vendor" | "distributor"; commissionValue: number }) {

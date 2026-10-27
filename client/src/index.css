@@ -660,3 +660,15 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
 .order-admin-actions button:hover { background:#fff0f5; border-color:#c51a55; }
 .order-admin-actions button.danger { color:#a5163e; border-color:#edb4c4; }
 .order-admin-actions button:disabled { opacity:.5; cursor:not-allowed; }
+
+.partner-row { flex-wrap:wrap; }
+.partner-link-actions { flex-basis:100%; display:flex; justify-content:flex-end; margin-top:4px; }
+.partner-link-actions button { display:inline-flex; align-items:center; gap:5px; border:1px solid #e7bfd0; border-radius:6px; background:#fff6f9; color:#9b0d46; padding:6px 9px; font:700 10px Inter,sans-serif; cursor:pointer; }
+.partner-link-actions button:hover { background:#ffe4ed; border-color:#d31a61; }
+.partner-link-actions button:disabled { opacity:.55; cursor:wait; }
+
+.partner-row { flex-wrap:wrap; }
+.partner-link-actions { flex-basis:100%; display:flex; justify-content:flex-end; margin-top:4px; }
+.partner-link-actions button { display:inline-flex; align-items:center; gap:5px; border:1px solid #e7bfd0; border-radius:6px; background:#fff6f9; color:#9b0d46; padding:6px 9px; font:700 10px Inter,sans-serif; cursor:pointer; }
+.partner-link-actions button:hover { background:#ffe4ed; border-color:#d31a61; }
+.partner-link-actions button:disabled { opacity:.55; cursor:wait; }

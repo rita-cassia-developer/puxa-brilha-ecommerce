@@ -2,7 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, customerProcedure, publicProcedure, router, vendorProcedure } from "./_core/trpc";
-import { createManualVendor, createOrder, createProduct, deleteOrder, deleteProduct, getOrderDetail, getVendorDashboard, listCommissions, listCustomerOrders, listLeads, listOrders, listProducts, listVendors, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
+import { createManualVendor, createOrder, createProduct, deleteOrder, deleteProduct, ensureOwnReferralLink, ensureReferralLink, getOrderDetail, getVendorDashboard, listCommissions, listCustomerOrders, listLeads, listOrders, listProducts, listVendors, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
 import { z } from "zod";
 
 const productInput = z.object({
@@ -114,9 +114,11 @@ export const appRouter = router({
   partners: router({
     vendors: adminProcedure.query(() => listVendors()),
     createVendor: adminProcedure.input(z.object({ displayName: z.string().trim().min(2).max(160), email: z.string().trim().email(), phone: z.string().max(40).optional(), partnerType: z.enum(["representative", "vendor", "distributor"]).default("vendor"), commissionValue: z.coerce.number().min(0).max(100) })).mutation(({ input }) => createManualVendor(input)),
+    generateLink: adminProcedure.input(z.object({ vendorId: z.number().int().positive() })).mutation(({ input }) => ensureReferralLink(input.vendorId)),
     leads: adminProcedure.query(() => listLeads()),
     commissions: adminProcedure.query(() => listCommissions()),
     dashboard: vendorProcedure.query(({ ctx }) => getVendorDashboard(ctx.user.id)),
+    generateOwnLink: vendorProcedure.mutation(({ ctx }) => ensureOwnReferralLink(ctx.user.id)),
   }),
 
   // TODO: add feature routers here, e.g.
