@@ -597,3 +597,22 @@ body { font-family: var(--font-primary) !important; }
 h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
 .market-logo, .admin-logo, .vendor-brand, .wordmark { font-weight: 800; letter-spacing: -0.045em; }
 .market-overline, .puxa-brilha-eyebrow, .eyebrow, .eyebrow-small, .market-product-category, .admin-nav-label, .table-head { font-weight: 700; letter-spacing: .12em; }
+
+/* Logo oficial Puxa e Brilha — aplicada em todas as áreas da experiência. */
+.brand-logo { display:block; width:auto; height:auto; object-fit:contain; object-position:center; mix-blend-mode:multiply; }
+.brand-logo-header { width:154px; max-height:58px; }
+.brand-logo-checkout { width:145px; max-height:48px; }
+.brand-logo-footer { width:175px; max-height:64px; background:#fff; padding:4px 8px; border-radius:4px; }
+.brand-logo-admin { width:144px; max-height:52px; }
+.brand-logo-vendor { width:145px; max-height:50px; }
+.brand-logo-customer, .brand-logo-legal { width:145px; max-height:52px; }
+.market-logo:has(.brand-logo), .admin-logo:has(.brand-logo), .vendor-brand:has(.brand-logo) { display:flex; align-items:center; gap:9px; }
+.admin-logo:has(.brand-logo) { flex-wrap:wrap; }
+.vendor-brand:has(.brand-logo) { flex-direction:column; align-items:flex-start; gap:2px; }
+.checkout-logo { display:flex; flex-direction:column; align-items:flex-start; gap:2px; }
+.checkout-logo small { align-self:flex-start; }
+@media(max-width:700px){
+  .brand-logo-header { width:130px; max-height:48px; }
+  .brand-logo-customer, .brand-logo-legal { width:125px; max-height:46px; }
+  .brand-logo-checkout { width:120px; max-height:40px; }
+}
