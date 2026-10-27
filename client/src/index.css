@@ -616,3 +616,27 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
   .brand-logo-customer, .brand-logo-legal { width:125px; max-height:46px; }
   .brand-logo-checkout { width:120px; max-height:40px; }
 }
+
+/* Rodapé completo de marketplace: confiança, navegação e identidade. */
+.footer-trust-row { display:grid; grid-template-columns:repeat(4,1fr); gap:0; border-top:1px solid rgba(255,255,255,.14); border-bottom:1px solid rgba(255,255,255,.14); }
+.footer-trust-row > div { display:flex; align-items:center; gap:11px; min-height:82px; padding:16px 18px; border-right:1px solid rgba(255,255,255,.12); }
+.footer-trust-row > div:first-child { padding-left:0; }
+.footer-trust-row > div:last-child { border-right:0; }
+.footer-trust-row svg { flex:none; color:#ffb2c9; }
+.footer-trust-row span { display:grid; gap:4px; }
+.footer-trust-row b { color:#fff; font-size:11px; }
+.footer-trust-row small { color:#e8bfcf; font-size:10px; line-height:1.35; }
+.market-footer .footer-grid { min-height:0; grid-template-columns:1.45fr repeat(3,1fr); gap:42px; padding-top:42px; padding-bottom:38px; }
+.market-footer .footer-grid > div { gap:11px; }
+.market-footer .footer-brand-column { gap:13px !important; }
+.market-footer .footer-brand-column p { max-width:270px; color:#f2dce5; font-size:12px; }
+.market-footer .footer-company-id { color:#d4aabd !important; font-size:10px !important; }
+.market-footer .footer-grid > div > b { color:#ffcfdd; font-size:11px; letter-spacing:.04em; text-transform:uppercase; }
+.market-footer .footer-grid a, .market-footer .footer-grid span { color:#e8c8d4; font-size:11px; }
+.market-footer .footer-grid a:hover { color:#fff; }
+.market-footer .footer-social-links { margin-top:5px; gap:9px !important; }
+.market-footer .footer-social-links b { color:#ffcfdd; }
+.market-footer .footer-social-links a { display:inline-flex; align-items:center; gap:5px; color:#fff !important; }
+.market-footer .footer-bottom { min-height:58px; border-top:1px solid rgba(255,255,255,.15); color:#d4aabd; font-size:10px; }
+@media(max-width:900px){ .footer-trust-row { grid-template-columns:repeat(2,1fr); }.footer-trust-row > div:nth-child(2) { border-right:0; }.footer-trust-row > div:nth-child(-n+2) { border-bottom:1px solid rgba(255,255,255,.12); }.footer-trust-row > div:first-child { padding-left:18px; }.market-footer .footer-grid { gap:28px; } }
+@media(max-width:600px){ .footer-trust-row { grid-template-columns:1fr; }.footer-trust-row > div, .footer-trust-row > div:nth-child(2) { min-height:62px; padding:12px 0; border-right:0; border-bottom:1px solid rgba(255,255,255,.12); }.footer-trust-row > div:last-child { border-bottom:0; }.market-footer .footer-grid { grid-template-columns:1fr 1fr; gap:28px 18px; padding-top:30px; }.market-footer .footer-grid > div:first-child { grid-column:span 2; }.market-footer .footer-bottom { gap:7px; padding:15px 0; line-height:1.4; } }
