@@ -11,7 +11,7 @@ export default function Vendor() {
   const dashboard = trpc.partners.dashboard.useQuery(undefined, { enabled: auth.data?.role === "vendor" || auth.data?.role === "admin", retry: false });
   const generateOwnLink = trpc.partners.generateOwnLink.useMutation({ onSuccess: result => { const url = `${window.location.origin}/?ref=${result.code}`; navigator.clipboard?.writeText(url); dashboard.refetch(); window.alert("Link gerado e copiado para envio."); } });
   if (auth.isLoading) return <div className="auth-gate"><LoaderCircle className="auth-spinner" size={26} /><p>Verificando acesso…</p></div>;
-  if (!auth.data) return <div className="auth-gate"><div className="auth-gate-card"><h1>Área do parceiro</h1><p>Entre com sua conta para consultar seus resultados.</p><button className="auth-gate-button" onClick={startLogin}>Entrar</button><Link href="/cliente" className="auth-gate-link">Escolher perfil de acesso</Link></div></div>;
+  if (!auth.data) return <div className="auth-gate"><div className="auth-gate-card"><h1>Área do parceiro</h1><p>Entre com sua conta para consultar seus resultados.</p><button className="auth-gate-button" onClick={() => startLogin()}>Entrar</button><Link href="/cliente" className="auth-gate-link">Escolher perfil de acesso</Link></div></div>;
   if (auth.data.role !== "vendor" && auth.data.role !== "admin") return <div className="auth-gate"><div className="auth-gate-card"><h1>Acesso restrito</h1><p>Esta área é exclusiva para parceiros cadastrados.</p><Link href="/" className="auth-gate-button">Voltar à loja</Link></div></div>;
   if (dashboard.isLoading) return <div className="auth-gate"><LoaderCircle className="auth-spinner" size={26} /><p>Carregando seu desempenho…</p></div>;
   const data = dashboard.data;

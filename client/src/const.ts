@@ -12,7 +12,7 @@ export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 // call would desync it from an in-flight login and the callback would reject it
 // with "invalid oauth state". It returns void by design, so there is no URL to
 // stash across renders.
-export const startLogin = () => {
+export const startLogin = (returnPath = window.location.pathname) => {
   const oauthPortalUrl = window.__MANUS_CONFIG__?.oauthPortalUrl;
   const appId = window.__MANUS_CONFIG__?.projectId;
   if (!oauthPortalUrl || !appId) throw new Error("Manus login is not configured");
@@ -20,7 +20,8 @@ export const startLogin = () => {
 
   const nonce = crypto.randomUUID();
   document.cookie = `${OAUTH_STATE_COOKIE}=${nonce}; Path=/; Max-Age=600; SameSite=None; Secure`;
-  const state = encodeOAuthState({ redirectUri, nonce });
+  const safeReturnPath = returnPath.startsWith("/") && !returnPath.startsWith("//") ? returnPath : "/";
+  const state = encodeOAuthState({ redirectUri, nonce, returnPath: safeReturnPath });
 
   const url = new URL(`${oauthPortalUrl}/app-auth`);
   url.searchParams.set("appId", appId);

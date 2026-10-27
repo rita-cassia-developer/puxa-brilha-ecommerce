@@ -31,7 +31,7 @@ function AdminSidebar({ active, count }: { active: string; count: number }) {
 }
 
 function ProductForm({ product, onCancel, onSave }: { product: Product | null; onCancel: () => void; onSave: (product: Omit<Product, "id">) => void }) {
-  const [form, setForm] = useState<Omit<Product, "id">>(product ? { name: product.name, category: product.category, price: product.price, weightKg: product.weightKg, oldPrice: product.oldPrice, badge: product.badge, description: product.description, stock: product.stock, accent: product.accent, note: product.note } : emptyForm);
+  const [form, setForm] = useState<Omit<Product, "id">>(product ? { name: product.name, category: product.category, price: product.price, imageUrl: product.imageUrl, weightKg: product.weightKg, oldPrice: product.oldPrice, badge: product.badge, description: product.description, stock: product.stock, accent: product.accent, note: product.note } : emptyForm);
   const update = (key: keyof typeof form, value: string | number) => setForm(prev => ({ ...prev, [key]: value }));
   const save = () => {
     if (!form.name.trim() || !form.price || !form.description.trim()) {
@@ -47,6 +47,7 @@ function ProductForm({ product, onCancel, onSave }: { product: Product | null; o
       <label className="field"><span>Nome do produto</span><input value={form.name} onChange={e => update("name", e.target.value)} placeholder="Ex.: Creme de mãos" autoFocus /></label>
       <div className="field-row"><label className="field"><span>Categoria</span><select value={form.category} onChange={e => update("category", e.target.value)}>{categories.filter(category => category !== "Todos").map(category => <option key={category} value={category}>{categoryLabels[category]}</option>)}</select></label><label className="field"><span>Preço (R$)</span><input type="number" min="0" step="0.01" value={form.price || ""} onChange={e => update("price", Number(e.target.value))} placeholder="0,00" /></label></div>
       <div className="field-row"><label className="field"><span>Peso (kg)</span><input type="number" min="0" step="0.1" value={form.weightKg ?? ""} onChange={e => update("weightKg", Number(e.target.value))} placeholder="1,4" /></label><label className="field"><span>Estoque</span><input type="number" min="0" value={form.stock} onChange={e => update("stock", Number(e.target.value))} /></label><label className="field"><span>Selo de destaque</span><input value={form.badge ?? ""} onChange={e => update("badge", e.target.value)} placeholder="Novo, Ritual..." /></label></div>
+      <label className="field"><span>Foto do produto (URL opcional)</span><input type="url" value={form.imageUrl ?? ""} onChange={e => update("imageUrl", e.target.value)} placeholder="https://.../foto-do-produto.webp" /><small className="field-help">Use uma URL pública HTTPS. O campo pode ser preenchido depois.</small></label>
       <label className="field"><span>Nota olfativa ou ingrediente</span><input value={form.note} onChange={e => update("note", e.target.value)} placeholder="Ex.: Aloe + chá branco" /></label>
       <label className="field"><span>Descrição curta</span><textarea value={form.description} onChange={e => update("description", e.target.value)} placeholder="Descreva a sensação e os ativos principais." rows={3} /></label>
       <div className="field"><span>Cor da embalagem</span><div className="color-options">{(["rose", "sand", "clay", "olive", "ink"] as const).map(color => <button key={color} type="button" className={`color-option color-${color} ${form.accent === color ? "selected" : ""}`} onClick={() => update("accent", color)} aria-label={`Selecionar cor ${color}`} />)}</div></div>
@@ -93,7 +94,7 @@ export default function Admin() {
   };
   const filteredOrders = statusFilter === "all" ? orders : orders.filter(order => order.orderStatus === statusFilter || order.paymentStatus === statusFilter);
   const products: Product[] = (productsQuery.data ?? []).map(row => ({
-    id: String(row.id), name: row.name, category: (row.category as Product["category"]) || "Wax", price: Number(row.price), oldPrice: row.oldPrice == null ? undefined : Number(row.oldPrice),
+    id: String(row.id), name: row.name, category: (row.category as Product["category"]) || "Wax", imageUrl: row.imageUrl ?? undefined, price: Number(row.price), oldPrice: row.oldPrice == null ? undefined : Number(row.oldPrice),
     badge: row.badge ?? undefined, description: row.description, stock: row.stock, weightKg: row.weightGrams / 1000,
     accent: (row.accent as Product["accent"]) || "rose", note: row.note || "Cera depilatória profissional",
   }));
@@ -118,7 +119,7 @@ export default function Admin() {
     toast.success(`${eligible.length} comissão(ões) exportada(s).`);
   };
   const save = async (payload: Omit<Product, "id">) => {
-    const input = { name: payload.name, category: payload.category, description: payload.description, price: payload.price, oldPrice: payload.oldPrice ?? null, badge: payload.badge ?? null, accent: payload.accent, note: payload.note ?? null, stock: payload.stock, weightGrams: Math.round((payload.weightKg ?? 1.4) * 1000), status: "active" as const };
+    const input = { name: payload.name, category: payload.category, description: payload.description, price: payload.price, oldPrice: payload.oldPrice ?? null, badge: payload.badge ?? null, imageUrl: payload.imageUrl?.trim() || null, accent: payload.accent, note: payload.note ?? null, stock: payload.stock, weightGrams: Math.round((payload.weightKg ?? 1.4) * 1000), status: "active" as const };
     try {
       if (editing) await updateProduct.mutateAsync({ ...input, id: Number(editing.id) });
       else await createProduct.mutateAsync(input);

@@ -119,7 +119,7 @@ export default function Home() {
   const referralVisit = trpc.referrals.visit.useMutation();
   const catalogQuery = trpc.catalog.list.useQuery(undefined, { retry: 1 });
   const products: Product[] = catalogQuery.data?.map(row => ({
-    id: String(row.id), name: row.name, category: "Wax", price: Number(row.price), oldPrice: row.oldPrice == null ? undefined : Number(row.oldPrice),
+    id: String(row.id), name: row.name, category: (row.category as Product["category"]) || "Wax", imageUrl: row.imageUrl ?? undefined, price: Number(row.price), oldPrice: row.oldPrice == null ? undefined : Number(row.oldPrice),
     badge: row.badge ?? undefined, description: row.description, stock: row.stock, weightKg: row.weightGrams / 1000,
     accent: (row.accent as Product["accent"]) || "rose", note: row.note || "Cera depilatória profissional",
   })) ?? localProducts;
