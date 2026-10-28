@@ -793,5 +793,5 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
   padding: 0;
   object-fit: cover;
   object-position: center;
-  transform: scale(1.04);
+  transform: scale(0.96);
 }
