@@ -678,3 +678,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
 .market-product-media { aspect-ratio: 1 / 1; overflow: hidden; }
 .market-product-media .product-visual { width: 100%; height: 100%; min-height: 0; }
 .market-product-media .product-real-image { width: 100%; height: 100%; object-fit: contain; padding: 12px; }
+
+/* Seletor de demonstração dos portais comerciais. */
+.demo-profile-links, .demo-switcher { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; }
+.demo-profile-links { justify-content: center; margin: 22px 0; }
+.demo-profile-links span, .demo-switcher span { color: #806b70; font-size: 11px; }
+.demo-profile-links a, .demo-switcher a { padding: 7px 10px; color: #6e293a; background: #fff2f4; border: 1px solid #e4bcc6; border-radius: 4px; font-size: 10px; font-weight: 800; }
+.demo-profile-links a:hover, .demo-switcher a:hover { color: #fff; background: #6e293a; }
+.demo-switcher { margin-top: 22px; padding-top: 18px; border-top: 1px solid #edd5d9; }
+@media (max-width: 560px) { .demo-profile-links, .demo-switcher { gap: 7px; } .demo-profile-links a, .demo-switcher a { flex: 1 1 auto; text-align: center; } }
