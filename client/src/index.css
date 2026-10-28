@@ -846,3 +846,17 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
   border-top-color: #e7c6cd !important;
   color: #8b5361 !important;
 }
+
+/* Cor oficial das letras da logo — aplicada aos elementos que representam a marca */
+:root { --pb-logo-rose: #b50946; }
+.market-logo,
+.vendor-brand,
+.admin-logo,
+.wordmark,
+.wordmark-mark { color: var(--pb-logo-rose) !important; }
+.market-logo small,
+.vendor-brand small,
+.admin-logo-sub,
+.story-card-main span,
+.professional-banner-seal span,
+.footer-company-id { color: var(--pb-logo-rose) !important; }
