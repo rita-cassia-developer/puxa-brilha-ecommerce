@@ -795,3 +795,14 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
   object-position: center;
   transform: scale(0.84);
 }
+
+/* Produtos com foto real: cera e lenço compartilham a mesma escala dentro da moldura. */
+.market-product-media .product-real-image-Wax,
+.market-product-media .product-real-image-DepilatoryStrips {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(0.84);
+}
