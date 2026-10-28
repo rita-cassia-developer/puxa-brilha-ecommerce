@@ -806,3 +806,11 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
   object-position: center;
   transform: scale(0.84);
 }
+
+/* O lenço deve aparecer inteiro; a moldura é igual, mas sem corte da arte. */
+.market-product-media .product-real-image-DepilatoryStrips {
+  padding: 16px;
+  object-fit: contain;
+  object-position: center;
+  transform: none;
+}
