@@ -814,3 +814,28 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
   object-position: center;
   transform: none;
 }
+
+/* Rodapé final — rosa escuro da marca com fundo claro para leitura confortável */
+.market-footer {
+  background: #fff8f9 !important;
+  color: #6e293a !important;
+  border-top-color: #e7c6cd !important;
+}
+.market-footer .market-logo { color: #6e293a !important; }
+.market-footer .footer-trust-row,
+.market-footer .footer-trust-row > div { border-color: #e7c6cd !important; }
+.market-footer .footer-trust-row svg { color: #9f4961 !important; }
+.market-footer .footer-trust-row b,
+.market-footer .footer-grid > div > b,
+.market-footer .footer-social-links b { color: #6e293a !important; }
+.market-footer .footer-trust-row small,
+.market-footer .footer-grid p,
+.market-footer .footer-company-id,
+.market-footer .footer-grid a,
+.market-footer .footer-grid span { color: #8b5361 !important; }
+.market-footer .footer-grid a:hover,
+.market-footer .footer-social-links a { color: #9f4961 !important; }
+.market-footer .footer-bottom {
+  border-top-color: #e7c6cd !important;
+  color: #8b5361 !important;
+}

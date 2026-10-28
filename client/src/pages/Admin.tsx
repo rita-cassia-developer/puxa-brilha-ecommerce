@@ -23,7 +23,7 @@ const emptyForm: Omit<Product, "id"> = {
 
 function AdminSidebar({ active, count }: { active: string; count: number }) {
   return <aside className="admin-sidebar">
-    <Link href="/" className="admin-logo"><img className="brand-logo brand-logo-admin" src="/brand/puxa-e-brilha-logo.jpeg" alt="Puxa & Brilha" /><span className="admin-logo-sub">Studio</span></Link>
+    <Link href="/" className="admin-logo"><img className="brand-logo brand-logo-admin" src="/brand/puxa-brilha-logo.png" alt="Puxa & Brilha" /><span className="admin-logo-sub">Studio</span></Link>
     <div className="admin-workspace"><span className="workspace-dot" /><span><b>Loja principal</b><small>Ambiente de demonstração</small></span></div>
     <nav className="admin-nav"><span className="admin-nav-label">Gestão</span><a className={active === "overview" ? "active" : ""} href="#overview"><LayoutGrid size={17} />Visão geral</a><a className={active === "products" ? "active" : ""} href="#products"><Package size={17} />Produtos <span className="nav-count">{count}</span></a><a href="#orders"><ShoppingBag size={17} />Pedidos <span className="nav-pill">Gestão</span></a><a href="#partners"><UsersIcon size={17} />Parceiros</a><span className="admin-nav-label admin-nav-label-spaced">Configurações</span><a href="#settings"><Settings2 size={17} />Preferências</a></nav>
     <div className="admin-sidebar-footer"><div className="admin-avatar">PB</div><div><b>Loja Puxa & Brilha</b><small>Administrador</small></div><button aria-label="Mais opções">•••</button></div>
