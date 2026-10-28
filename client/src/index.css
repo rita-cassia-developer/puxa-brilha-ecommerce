@@ -860,3 +860,12 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
 .story-card-main span,
 .professional-banner-seal span,
 .footer-company-id { color: var(--pb-logo-rose) !important; }
+
+/* Todo texto de identidade que antes usava rosa vibrante agora acompanha as letras da logo */
+.puxa-brilha-hero h1 em,
+.puxa-brilha-hero-caption,
+.puxa-brilha-hero-caption b,
+.puxa-brilha-hero-points svg,
+.benefit-number,
+.text-arrow { color: var(--pb-logo-rose) !important; }
+.puxa-brilha-hero-caption { border-left-color: var(--pb-logo-rose) !important; }
