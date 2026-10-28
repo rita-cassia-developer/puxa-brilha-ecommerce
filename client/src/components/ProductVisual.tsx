@@ -13,7 +13,7 @@ export function ProductVisual({ product, compact = false }: { product: Product; 
         <div className="visual-shadow" />
         <div className="visual-jar visual-jar-wide">
           <div className="jar-lid" />
-          <div className="jar-body"><span>PB</span><small>PUXA E BRILHA</small></div>
+          <div className="jar-body"><span>PB</span><small>PUXA & BRILHA</small></div>
         </div>
         <div className="visual-note">{product.note}</div>
       </>}

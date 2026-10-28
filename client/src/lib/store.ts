@@ -27,7 +27,7 @@ type Seed = Omit<Product, "id" | "category">;
 const seeds: Record<Category, Seed[]> = {
   Wax: [
     {
-      name: "Puxa e Brilha — Cera de Morango",
+      name: "Puxa & Brilha — Cera de Morango",
       description: "Cera de morango que deixa a pele lisa e brilhosa, ideal para clínicas e profissionais de beleza.",
       price: 0,
       weightKg: 1.4,

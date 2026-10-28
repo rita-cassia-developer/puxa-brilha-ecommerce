@@ -130,7 +130,7 @@ export async function seedInitialProduct() {
   const existing = await db.select({ id: products.id }).from(products).where(eq(products.slug, "puxa-e-brilha-cera-de-morango")).limit(1);
   if (existing.length > 0) return existing[0].id;
   const result = await db.insert(products).values({
-    name: "Puxa e Brilha — Cera de Morango",
+    name: "Puxa & Brilha — Cera de Morango",
     slug: "puxa-e-brilha-cera-de-morango",
     category: "Wax",
     description: "Cera de morango que deixa a pele lisa e brilhosa, ideal para clínicas e profissionais de beleza.",
