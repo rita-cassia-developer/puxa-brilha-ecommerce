@@ -755,3 +755,33 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
 .product-rating-stars { display:flex; align-items:center; gap:1px; }
 .product-rating-stars button { display:grid; place-items:center; width:19px; height:19px; padding:0; color:#c5a1aa; background:transparent; border:0; cursor:pointer; }
 .product-rating-stars button:hover, .product-rating-stars button.selected { color:#d99827; }
+
+/* Categorias: moldura única para imagens de formatos diferentes. */
+.category-circles .category-circle-art {
+  width: 96px;
+  height: 96px;
+  flex: 0 0 96px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #fff7f9 !important;
+  border: 1px solid #efc5d2;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 7px #fffdfd, 0 8px 16px rgba(124,7,55,.08);
+}
+.category-circles .category-circle-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 50%;
+}
+.category-circles .category-circle-art.body img {
+  padding: 10px;
+}
+@media (max-width: 600px) {
+  .category-circles .category-circle-art { width: 76px; height: 76px; flex-basis: 76px; }
+  .category-circles .category-circle-art img { padding: 7px; }
+}
