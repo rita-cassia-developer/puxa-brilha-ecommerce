@@ -687,3 +687,22 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
 .demo-profile-links a:hover, .demo-switcher a:hover { color: #fff; background: #6e293a; }
 .demo-switcher { margin-top: 22px; padding-top: 18px; border-top: 1px solid #edd5d9; }
 @media (max-width: 560px) { .demo-profile-links, .demo-switcher { gap: 7px; } .demo-profile-links a, .demo-switcher a { flex: 1 1 auto; text-align: center; } }
+
+/* Área profissional separada do fluxo de compra do consumidor. */
+.professional-access-page { min-height: 100vh; color: #6e293a; background: #fffaf7; }
+.professional-access-header { height: 76px; display: flex; align-items: center; justify-content: space-between; padding: 0 5vw; background: #fff; border-bottom: 1px solid #edd5d9; }
+.professional-access-header .brand-logo { width: 105px; height: 50px; object-fit: contain; }
+.professional-access-header .test-badge { display: inline-flex; align-items: center; gap: 5px; }
+.professional-access-content { width: min(1050px, calc(100% - 32px)); margin: 0 auto; padding: 76px 0 48px; text-align: center; }
+.professional-access-content h1 { max-width: 700px; margin: 12px auto 14px; font: 700 clamp(32px, 5vw, 58px)/.98 Inter, sans-serif; letter-spacing: -.06em; color: #6e293a; }
+.professional-access-content > p { max-width: 620px; margin: 0 auto 36px; color: #806b70; font-size: 13px; line-height: 1.7; }
+.professional-profile-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; text-align: left; }
+.professional-profile-card { min-height: 285px; display: flex; flex-direction: column; align-items: flex-start; padding: 24px; background: #fff; border: 1px solid #edd5d9; box-shadow: 0 12px 30px rgba(110,41,58,.06); }
+.professional-profile-icon { display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 18px; color: #fff; background: #6e293a; border-radius: 50%; }
+.professional-profile-card h2 { margin-bottom: 8px; font-size: 18px; color: #6e293a; }
+.professional-profile-card p { min-height: 58px; margin-bottom: 18px; color: #806b70; font-size: 11px; line-height: 1.55; }
+.professional-profile-card .button { width: 100%; margin-top: auto; font-size: 10px; }
+.professional-demo-link { align-self: center; margin-top: 13px; color: #9b0d46; font-size: 10px; font-weight: 800; text-decoration: underline; }
+.professional-back-store { display: inline-block; margin-top: 30px; color: #9b0d46; font-size: 11px; font-weight: 800; }
+@media (max-width: 850px) { .professional-profile-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .professional-access-header { padding: 0 14px; } .professional-access-header .admin-breadcrumb { font-size: 10px; } .professional-access-content { padding-top: 46px; } .professional-profile-grid { grid-template-columns: 1fr; } .professional-profile-card { min-height: 0; } }
