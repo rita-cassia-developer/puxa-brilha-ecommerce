@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, like } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, like, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, commissions, leads, orderItems, orders, products, referralLinks, referralVisits, users, vendors } from "../drizzle/schema";
 import { ENV } from "./_core/env";
@@ -175,7 +175,7 @@ export async function createOrder(input: CreateOrderInput, customerUserId?: numb
     const product = byId.get(item.productId);
     if (!product || product.status !== "active") throw new Error("Produto indisponível");
     if (!Number.isInteger(item.quantity) || item.quantity < 1) throw new Error("Quantidade inválida");
-    if (item.quantity > product.stock && product.stock > 0) throw new Error(`Estoque insuficiente para ${product.name}`);
+    if (item.quantity > product.stock) throw new Error(`Estoque insuficiente para ${product.name}`);
     return { product, quantity: item.quantity, unitPrice: Number(product.price) };
   });
   const subtotal = lines.reduce((sum, line) => sum + line.unitPrice * line.quantity, 0);
@@ -192,6 +192,14 @@ export async function createOrder(input: CreateOrderInput, customerUserId?: numb
       customerUserId: customerUserId ?? null, vendorId: referral[0]?.vendorId ?? null, referralCode: referral[0]?.code ?? null,
     });
     const orderId = Number(inserted[0].insertId);
+    for (const line of lines) {
+      const stockUpdate = await tx.update(products)
+        .set({ stock: sql`${products.stock} - ${line.quantity}` })
+        .where(and(eq(products.id, line.product.id), eq(products.status, "active"), sql`${products.stock} >= ${line.quantity}`));
+      if (Number((stockUpdate as { affectedRows?: number }).affectedRows ?? 0) !== 1) {
+        throw new Error(`Estoque insuficiente para ${line.product.name}`);
+      }
+    }
     await tx.insert(orderItems).values(lines.map(line => ({ orderId, productId: line.product.id, productName: line.product.name, quantity: line.quantity, unitPrice: line.unitPrice.toFixed(2) })));
     if (referral[0] && subtotal > 0) {
       const vendor = await tx.select({ commissionType: vendors.commissionType, commissionValue: vendors.commissionValue }).from(vendors).where(eq(vendors.id, referral[0].vendorId)).limit(1);
@@ -237,15 +245,35 @@ export async function getOrderDetail(id: number) {
 export async function updateOrderStatus(id: number, input: { paymentStatus?: "pending" | "approved" | "rejected" | "refunded"; orderStatus?: "pending" | "paid" | "processing" | "shipped" | "ready_pickup" | "completed" | "cancelled" }) {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
-  await db.update(orders).set(input).where(eq(orders.id, id));
   const rows = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
-  return rows[0];
+  if (!rows[0]) throw new Error("Pedido não encontrado");
+  const current = rows[0];
+  const releaseStock = (input.orderStatus === "cancelled" || input.paymentStatus === "rejected")
+    && current.orderStatus !== "cancelled" && current.paymentStatus !== "rejected";
+  await db.transaction(async tx => {
+    if (releaseStock) {
+      const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, id));
+      for (const item of items) {
+        await tx.update(products).set({ stock: sql`${products.stock} + ${item.quantity}` }).where(eq(products.id, item.productId));
+      }
+    }
+    await tx.update(orders).set(input).where(eq(orders.id, id));
+  });
+  const updated = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+  return updated[0];
 }
 
 export async function deleteOrder(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
   await db.transaction(async tx => {
+    const order = await tx.select().from(orders).where(eq(orders.id, id)).limit(1);
+    if (order[0] && order[0].orderStatus !== "cancelled" && order[0].paymentStatus !== "rejected") {
+      const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, id));
+      for (const item of items) {
+        await tx.update(products).set({ stock: sql`${products.stock} + ${item.quantity}` }).where(eq(products.id, item.productId));
+      }
+    }
     await tx.delete(commissions).where(eq(commissions.orderId, id));
     await tx.delete(orderItems).where(eq(orderItems.orderId, id));
     await tx.delete(orders).where(eq(orders.id, id));
