@@ -8,7 +8,7 @@ export function ProductVisual({ product, compact = false }: { product: Product; 
   const showImage = Boolean(imageSrc) && !imageFailed;
   return (
     <div className={`product-visual product-visual-${product.accent} ${compact ? "product-visual-compact" : ""}`} aria-label={`Visual ilustrativo de ${product.name}`}>
-      {showImage ? <img className="product-real-image" src={imageSrc} alt={product.name} onError={() => setImageFailed(true)} /> : <>
+      {showImage ? <img className={`product-real-image product-real-image-${product.category}`} src={imageSrc} alt={product.name} onError={() => setImageFailed(true)} /> : <>
         <div className="visual-glow" />
         <div className="visual-shadow" />
         <div className="visual-jar visual-jar-wide">
