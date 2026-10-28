@@ -750,3 +750,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
   .market-product-media { aspect-ratio: 4 / 5; }
   .market-product-media .product-real-image { padding: 10px; }
 }
+
+.product-rating { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:9px; color:#8c7078; font-size:9px; }
+.product-rating-stars { display:flex; align-items:center; gap:1px; }
+.product-rating-stars button { display:grid; place-items:center; width:19px; height:19px; padding:0; color:#c5a1aa; background:transparent; border:0; cursor:pointer; }
+.product-rating-stars button:hover, .product-rating-stars button.selected { color:#d99827; }
