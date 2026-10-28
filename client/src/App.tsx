@@ -7,7 +7,6 @@ import Admin from "./pages/Admin";
 import Home from "./pages/Home";
 import Vendor from "./pages/Vendor";
 import Customer from "./pages/Customer";
-import ProfessionalAccess from "./pages/ProfessionalAccess";
 import Legal from "./pages/Legal";
 import { trpc } from "./lib/trpc";
 import { startLogin } from "./const";
@@ -32,7 +31,7 @@ function AdminGate() {
 }
 
 function Router() {
-  return <Switch><Route path="/" component={Home} /><Route path="/admin" component={AdminGate} /><Route path="/vendedor" component={Vendor} /><Route path="/cliente" component={Customer} /><Route path="/profissionais" component={ProfessionalAccess} /><Route path="/legal/:page" component={Legal} /><Route path="/404" component={NotFound} /><Route component={NotFound} /></Switch>;
+  return <Switch><Route path="/" component={Home} /><Route path="/admin" component={AdminGate} /><Route path="/vendedor" component={Vendor} /><Route path="/cliente" component={Customer} /><Route path="/legal/:page" component={Legal} /><Route path="/404" component={NotFound} /><Route component={NotFound} /></Switch>;
 }
 
 export default function App() {

@@ -706,3 +706,9 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
 .professional-back-store { display: inline-block; margin-top: 30px; color: #9b0d46; font-size: 11px; font-weight: 800; }
 @media (max-width: 850px) { .professional-profile-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .professional-access-header { padding: 0 14px; } .professional-access-header .admin-breadcrumb { font-size: 10px; } .professional-access-content { padding-top: 46px; } .professional-profile-grid { grid-template-columns: 1fr; } .professional-profile-card { min-height: 0; } }
+
+.mobile-professional-link { width: 100%; text-align: left; cursor: pointer; }
+.mobile-professional-link .menu-chevron-open { transform: rotate(180deg); }
+.mobile-professional-options { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; padding: 8px 0 12px 27px; }
+.mobile-professional-options button { display: flex; align-items: center; gap: 7px; min-height: 34px; padding: 0 9px; color: #6e293a; background: #fff; border: 1px solid #edd5d9; font-size: 10px; font-weight: 800; text-align: left; cursor: pointer; }
+.mobile-professional-options button:hover { color: #fff; background: #6e293a; }
