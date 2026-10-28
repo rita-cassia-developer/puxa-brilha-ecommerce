@@ -577,7 +577,13 @@ html, body, button, input, textarea, select { font-family: Inter, "Segoe UI", Ro
 /* Official supplied pack artwork for the new brand. */
 .puxa-brilha-label-image { position:relative; z-index:2; display:block; width:min(100%,560px); max-height:470px; object-fit:contain; border-radius:12px; filter:drop-shadow(0 22px 28px rgba(124,7,55,.22)); -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 13%,#000 87%,transparent 100%),linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.76) 10%,#000 22%,#000 84%,rgba(0,0,0,.76) 94%,transparent 100%); -webkit-mask-composite:source-in; mask-image:linear-gradient(to right,transparent 0%,#000 13%,#000 87%,transparent 100%),linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.76) 10%,#000 22%,#000 84%,rgba(0,0,0,.76) 94%,transparent 100%); mask-composite:intersect; }
 .puxa-brilha-hero-product { padding:22px; }
-.puxa-brilha-hero-product::after { position:absolute; inset:0; z-index:3; content:""; pointer-events:none; background:radial-gradient(ellipse 76% 78% at 50% 47%,transparent 54%,rgba(255,225,235,.08) 72%,#ffe1eb 100%); }
+.puxa-brilha-hero-product { background:radial-gradient(ellipse at 50% 42%,#ffd3e1 0%,#ed9ab5 50%,#c94a73 78%,var(--pb-magenta) 100%); }
+.puxa-brilha-hero-product::after { position:absolute; inset:0; z-index:3; content:""; pointer-events:none; background:radial-gradient(ellipse 76% 78% at 50% 47%,transparent 54%,rgba(255,211,225,.08) 72%,var(--pb-magenta) 100%); }
+.puxa-brilha-hero h1 em,
+.puxa-brilha-hero-caption,
+.puxa-brilha-hero-caption b,
+.puxa-brilha-hero-points svg { color:var(--pb-magenta) !important; }
+.puxa-brilha-hero-caption { border-left-color:var(--pb-magenta) !important; }
 .puxa-brilha-hero-caption { z-index:4; }
 @media(max-width:720px){.puxa-brilha-label-image{max-height:330px;width:100%}.puxa-brilha-hero-product{padding:14px}.puxa-brilha-hero-caption{bottom:12px}}
 
