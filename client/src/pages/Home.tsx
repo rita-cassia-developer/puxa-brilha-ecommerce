@@ -12,7 +12,7 @@ const categoryMap: Record<string, Product["category"] | "Todos"> = { "Cera de de
 const categoryLabel: Record<Product["category"], string> = { Wax: "Cera de depilação", TongueDepressor: "Abaixador de língua", DepilatoryStrips: "Tiras de depilação" };
 const WHATSAPP_URL = "https://wa.me/5534999003486?text=Ol%C3%A1%2C%20gostaria%20de%20saber%20mais%20sobre%20a%20Puxa%20%26%20Brilha";
 const SUPPORT_EMAIL = "contato@cerapuxaebrilha.com.br";
-const HELP_WHATSAPP_URL = "https://wa.me/5534999003486?text=Ol%C3%A1%2C%20preciso%20de%20ajuda";
+const HELP_WHATSAPP_URL = "https://wa.me/5534999003486?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20com%20o%20site%20da%20Puxa%20%26%20Brilha";
 
 function Header({ count, onCart, onSearch, onCategory }: { count: number; onCart: () => void; onSearch: (value: string) => void; onCategory: (category: Product["category"] | "Todos") => void }) {
   const [search, setSearch] = useState("");
