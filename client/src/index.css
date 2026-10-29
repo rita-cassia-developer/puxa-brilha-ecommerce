@@ -596,22 +596,22 @@ html, body, button, input, textarea, select { font-family: Inter, "Segoe UI", Ro
   position: relative;
   z-index: 1;
   display: block;
-  width: min(42%, 190px);
-  height: 88px;
+  width: min(62%, 320px);
+  height: 180px;
   margin: 0;
   object-fit: contain;
-  opacity: .82;
+  opacity: .62;
   mix-blend-mode: multiply;
   filter: drop-shadow(0 7px 9px rgba(125,11,56,.12));
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 17%, #000 83%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 26%, rgba(0,0,0,.82) 55%, transparent 100%);
   -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(to right, transparent 0%, #000 17%, #000 83%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  mask-image: radial-gradient(ellipse at center, #000 26%, rgba(0,0,0,.82) 55%, transparent 100%);
   mask-composite: intersect;
 }
 @media(max-width:720px){
   .puxa-brilha-hero-product { min-height: 400px; padding: 14px 14px 8px; }
   .puxa-brilha-label-image { max-height: 275px; }
-  .puxa-brilha-hero-decor { width: 70%; height: 86px; opacity: .72; }
+  .puxa-brilha-hero-decor { width: 88%; height: 150px; opacity: .56; }
 }
 
 /* Marketplace social proof and commercial partner modules. */
