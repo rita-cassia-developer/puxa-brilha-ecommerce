@@ -23,9 +23,15 @@ export function registerOAuthRoutes(app: Express) {
     // CSRF guard: the nonce in `state` must match the one-time cookie that
     // startLogin set in the browser that began this login. An attacker can
     // forge `state`, but cannot plant this cookie in the victim's browser.
-    const { nonce } = decodeOAuthState(state);
+    let decodedState: ReturnType<typeof decodeOAuthState>;
+    try {
+      decodedState = decodeOAuthState(state);
+    } catch {
+      res.status(400).json({ error: "invalid oauth state" });
+      return;
+    }
     const expectedNonce = parseCookieHeader(req.headers.cookie ?? "")[OAUTH_STATE_COOKIE];
-    if (!nonce || nonce !== expectedNonce) {
+    if (!decodedState.nonce || decodedState.nonce !== expectedNonce) {
       res.status(403).json({ error: "invalid oauth state" });
       return;
     }
@@ -56,7 +62,7 @@ export function registerOAuthRoutes(app: Express) {
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
-      const returnPath = decodeOAuthState(state).returnPath ?? "/";
+      const returnPath = decodedState.returnPath ?? "/";
       const safePath = returnPath.startsWith("/") && !returnPath.startsWith("//") && !returnPath.startsWith("/api/") ? returnPath : "/";
       res.redirect(302, safePath);
     } catch (error) {

@@ -872,3 +872,15 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
 .marketplace button:focus-visible,
 .marketplace input:focus-visible,
 .marketplace select:focus-visible { outline: 3px solid #7d0b38; outline-offset: 3px; }
+
+/* Contraste AAA para textos de apoio, badges, avaliações e atendimento. */
+.market-overline,
+.market-product-category,
+.application-steps article > span,
+.benefit-number { color: #6e4310 !important; }
+.professional-banner .market-overline,
+.market-promo .market-overline { color: #fff4f7 !important; }
+.market-badge { background: #6f293b !important; }
+.review-stars { color: #6b3a00 !important; }
+.whatsapp-float { background: #075a37 !important; }
+.whatsapp-float:hover { background: #06472c !important; }
