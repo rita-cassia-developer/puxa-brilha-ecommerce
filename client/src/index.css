@@ -574,10 +574,10 @@ html, body, button, input, textarea, select { font-family: Inter, "Segoe UI", Ro
 @media(max-width:600px){.puxa-brilha-hero{background:linear-gradient(155deg,#ffd6e5,#fff0f6)}.market-logo > span:not(.logo-symbol){font-size:20px!important}.puxa-brilha-hero h1{font-size:38px}}
 
 /* Official supplied pack artwork for the new brand. */
-.puxa-brilha-label-image { position:relative; z-index:3; display:block; width:min(100%,560px); max-height:470px; object-fit:contain; border-radius:12px; filter:drop-shadow(0 22px 28px rgba(124,7,55,.22)); }
+.puxa-brilha-label-image { position:relative; z-index:2; display:block; width:min(100%,560px); max-height:470px; object-fit:contain; border-radius:12px; filter:drop-shadow(0 22px 28px rgba(124,7,55,.22)); -webkit-mask-image:linear-gradient(to right,transparent 0%,#000 13%,#000 87%,transparent 100%),linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.76) 10%,#000 22%,#000 84%,rgba(0,0,0,.76) 94%,transparent 100%); -webkit-mask-composite:source-in; mask-image:linear-gradient(to right,transparent 0%,#000 13%,#000 87%,transparent 100%),linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.76) 10%,#000 22%,#000 84%,rgba(0,0,0,.76) 94%,transparent 100%); mask-composite:intersect; }
 .puxa-brilha-hero-product { padding:22px; }
 .puxa-brilha-hero-product { background:radial-gradient(ellipse at 50% 42%,#ffd3e1 0%,#ed9ab5 50%,#c94a73 78%,var(--pb-magenta) 100%); }
-.puxa-brilha-hero-product::after { position:absolute; inset:0; z-index:0; content:""; pointer-events:none; background:radial-gradient(ellipse 76% 78% at 50% 47%,transparent 54%,rgba(255,211,225,.08) 72%,var(--pb-magenta) 100%); }
+.puxa-brilha-hero-product::after { position:absolute; inset:0; z-index:3; content:""; pointer-events:none; background:radial-gradient(ellipse 76% 78% at 50% 47%,transparent 54%,rgba(255,211,225,.08) 72%,var(--pb-magenta) 100%); }
 .puxa-brilha-hero h1 em,
 .puxa-brilha-hero-caption,
 .puxa-brilha-hero-caption b,
@@ -585,40 +585,6 @@ html, body, button, input, textarea, select { font-family: Inter, "Segoe UI", Ro
 .puxa-brilha-hero-caption { border-left-color:var(--pb-magenta) !important; }
 .puxa-brilha-hero-caption { z-index:4; }
 @media(max-width:720px){.puxa-brilha-label-image{max-height:330px;width:100%}.puxa-brilha-hero-product{padding:14px}.puxa-brilha-hero-caption{bottom:12px}}
-
-/* Ilustração decorativa inferior: vem depois da embalagem e se dissolve no rosa. */
-.puxa-brilha-hero-product {
-  flex-direction: column;
-  min-height: 640px;
-  justify-content: flex-start;
-  padding: 14px 22px 0;
-  gap: 0;
-}
-.puxa-brilha-hero-decor {
-  position: relative;
-  left: auto;
-  bottom: auto;
-  z-index: 1;
-  display: block;
-  width: 132%;
-  height: 235px;
-  margin: 0;
-  object-fit: cover;
-  opacity: .52;
-  mix-blend-mode: multiply;
-  filter: drop-shadow(0 7px 9px rgba(125,11,56,.08));
-  transform: rotate(-23deg) translateY(-18px);
-  transform-origin: center center;
-  -webkit-mask-image: radial-gradient(ellipse at center, #000 26%, rgba(0,0,0,.82) 55%, transparent 100%);
-  -webkit-mask-composite: source-in;
-  mask-image: radial-gradient(ellipse at center, #000 26%, rgba(0,0,0,.82) 55%, transparent 100%);
-  mask-composite: intersect;
-}
-@media(max-width:720px){
-  .puxa-brilha-hero-product { min-height: 520px; padding: 14px 14px 8px; }
-  .puxa-brilha-label-image { max-height: 275px; }
-  .puxa-brilha-hero-decor { width: 148%; height: 205px; opacity: .44; transform: rotate(-23deg) translateY(-14px); }
-}
 
 /* Marketplace social proof and commercial partner modules. */
 .customer-reviews { padding: 76px 0 30px; }.review-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:28px; }.review-grid article { background:#fff; border:1px solid #f0cad7; padding:22px; box-shadow:0 10px 24px rgba(124,7,55,.07); }.review-stars { color:#ed9b21; letter-spacing:3px; font-size:16px; }.review-grid p { color:#5d3b48; font-size:14px; line-height:1.6; margin:14px 0 18px; }.review-grid strong,.review-grid small { display:block; }.review-grid strong { color:var(--pb-deep); }.review-grid small { color:#9b7584; margin-top:4px; font-size:11px; }.partner-modules { margin-top:32px; padding:25px; background:#fff; border:1px solid #edd5d9; border-radius:6px; }.partner-modules .admin-section-head { border:0; padding:0; margin-bottom:20px; }.partner-modules .admin-section-head p { margin-top:6px; color:#8c7078; font-size:12px; }.partner-module-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }.partner-module-grid article { display:flex; flex-direction:column; gap:12px; min-height:190px; padding:20px; border:1px solid #f1c8d5; background:linear-gradient(145deg,#fffafa,#fff1f5); }.partner-module-icon { width:38px; height:38px; display:grid; place-items:center; border-radius:12px; background:var(--pb-magenta); color:white; font-weight:900; font-size:18px; }.partner-module-grid strong { color:var(--pb-deep); font-size:18px; }.partner-module-grid p { margin:5px 0 0; color:#795466; line-height:1.45; font-size:12px; }.partner-module-grid button { margin-top:auto; border:0; background:none; padding:0; text-align:left; color:var(--pb-magenta); font-weight:800; font-size:12px; cursor:pointer; }.partner-module-grid button span { margin-left:8px; }.admin-nav a svg { flex:none; }
