@@ -42,7 +42,7 @@ function MarketplaceHero({ onViewOffers }: { onViewOffers: () => void }) {
       <div className="puxa-brilha-hero-actions"><button className="market-primary-cta" onClick={onViewOffers}>Conhecer a Cera de Morango <ArrowRight size={17} /></button><span><ShieldCheck size={16} /> Compra protegida</span></div>
       <div className="puxa-brilha-hero-points"><span><Check size={14} /> Pele lisa e brilhosa</span><span><Check size={14} /> Peso: 1,4 kg</span><span><Check size={14} /> Pagamento por Pix, cartão, boleto ou link</span></div>
     </div>
-    <div className="puxa-brilha-hero-product"><img className="puxa-brilha-label-image" src="/brand/puxa-e-brilha-cera-morango-hd.png" alt="Cera Puxa & Brilha de morango — pele lisa e brilhosa" /><div className="puxa-brilha-hero-caption"><b>Puxa & Brilha — Cera de Morango</b><span>Morangos, brilho e cuidado em cada detalhe.</span></div></div>
+    <div className="puxa-brilha-hero-product"><img className="puxa-brilha-label-image" src="/brand/puxa-e-brilha-cera-morango-logo-dark.png" alt="Cera Puxa & Brilha de morango — pele lisa e brilhosa" /><div className="puxa-brilha-hero-caption"><b>Puxa & Brilha — Cera de Morango</b><span>Morangos, brilho e cuidado em cada detalhe.</span></div></div>
   </section>;
 }
 function ProfessionalBanner({ onViewProducts }: { onViewProducts: () => void }) {
