@@ -727,8 +727,14 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
 .market-add-button:disabled:hover { color: #a99b9d; background: #f3eded; }
 
 /* Moldura uniforme dos produtos: preserva cada foto, mas padroniza o catálogo. */
+.market-product-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 .market-product-media {
   aspect-ratio: 4 / 5;
+  flex: 0 0 auto;
   min-height: 0;
   overflow: hidden;
   background: #fff7f9 !important;
@@ -753,9 +759,31 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
   object-fit: contain;
   object-position: center;
 }
+.market-product-info {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+.market-product-info .market-add-button {
+  margin-top: auto;
+}
+
+/* A cera horizontal ocupa a mesma área quadrada visual das outras artes. */
+.market-product-media .product-real-image-Wax {
+  width: calc(100% - 32px);
+  height: calc(100% - 32px);
+  padding: 0;
+  object-fit: cover;
+  object-position: center;
+  transform: none;
+}
 @media (max-width: 600px) {
   .market-product-media { aspect-ratio: 4 / 5; }
   .market-product-media .product-real-image { padding: 10px; }
+  .market-product-media .product-real-image-Wax {
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+  }
 }
 
 .product-rating { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:9px; color:#8c7078; font-size:9px; }
@@ -793,33 +821,29 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
   .category-circles .category-circle-art img { padding: 7px; }
 }
 
-/* A arte horizontal da cera precisa ocupar melhor o card; os demais produtos mantêm o encaixe atual. */
-.market-product-media .product-real-image-Wax {
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  object-fit: cover;
-  object-position: center;
-  transform: scale(0.84);
-}
-
-/* Produtos com foto real: cera e lenço compartilham a mesma escala dentro da moldura. */
-.market-product-media .product-real-image-Wax,
+/* Todas as artes reais usam exatamente a mesma área interna do card. */
+.market-product-media .product-real-image-TongueDepressor,
 .market-product-media .product-real-image-DepilatoryStrips {
   width: 100%;
   height: 100%;
-  padding: 0;
-  object-fit: cover;
-  object-position: center;
-  transform: scale(0.84);
-}
-
-/* O lenço deve aparecer inteiro; a moldura é igual, mas sem corte da arte. */
-.market-product-media .product-real-image-DepilatoryStrips {
   padding: 16px;
   object-fit: contain;
   object-position: center;
   transform: none;
+}
+.market-product-media .product-real-image-Wax {
+  width: calc(100% - 32px);
+  height: calc(100% - 32px);
+  padding: 0;
+  object-fit: cover;
+  object-position: center;
+  transform: none;
+}
+@media (max-width: 600px) {
+  .market-product-media .product-real-image-Wax {
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+  }
 }
 
 /* Rodapé final — rosa escuro da marca com fundo claro para leitura confortável */
