@@ -28,8 +28,9 @@ const seeds: Record<Category, Seed[]> = {
   Wax: [
     {
       name: "Puxa & Brilha — Cera de Morango",
+      imageUrl: "/brand/puxa-e-brilha-cera-morango-hd.png",
       description: "Cera de morango que deixa a pele lisa e brilhosa, ideal para clínicas e profissionais de beleza.",
-      price: 0,
+      price: 100,
       weightKg: 1.4,
       stock: 0,
       accent: "rose",
@@ -37,8 +38,28 @@ const seeds: Record<Category, Seed[]> = {
       badge: "Produto inicial",
     },
   ],
-  TongueDepressor: [],
-  DepilatoryStrips: [],
+  TongueDepressor: [
+    {
+      name: "Abaixador de língua",
+      imageUrl: "/brand/puxa-e-brilha-abaixador-lingua.png",
+      description: "Abaixador de língua para apoiar a rotina profissional de beleza.",
+      price: 14.9,
+      stock: 0,
+      accent: "sand",
+      note: "Abaixador de língua Puxa & Brilha",
+    },
+  ],
+  DepilatoryStrips: [
+    {
+      name: "Tiras de depilação",
+      imageUrl: "/brand/puxa-e-brilha-lenco-depilacao.jpeg",
+      description: "Tiras de depilação para um atendimento prático e organizado.",
+      price: 31.9,
+      stock: 0,
+      accent: "clay",
+      note: "Tiras de depilação Puxa & Brilha",
+    },
+  ],
 };
 
 export const initialProducts: Product[] = (Object.entries(seeds) as [Category, Seed[]][]).flatMap(([category, products]) => products.map((product, index) => ({ ...product, category, id: `${category.toLowerCase()}-${String(index + 1).padStart(2, "0")}` })));
