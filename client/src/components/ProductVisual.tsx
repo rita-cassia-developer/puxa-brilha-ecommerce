@@ -2,13 +2,16 @@ import type { Product } from "@/lib/store";
 import { useEffect, useState } from "react";
 
 export function ProductVisual({ product, compact = false }: { product: Product; compact?: boolean }) {
-  const imageSrc = product.imageUrl?.trim();
+  const imageSrc = product.imageUrl?.trim() || (product.category === "Wax" ? "/brand/puxa-e-brilha-cera-morango-square.jpeg" : undefined);
   const [imageFailed, setImageFailed] = useState(false);
   useEffect(() => setImageFailed(false), [imageSrc]);
   const showImage = Boolean(imageSrc) && !imageFailed;
   return (
     <div className={`product-visual product-visual-${product.accent} ${compact ? "product-visual-compact" : ""}`} aria-label={`Visual ilustrativo de ${product.name}`}>
-      {showImage ? <img className={`product-real-image product-real-image-${product.category}`} src={imageSrc} alt={product.name} onError={() => setImageFailed(true)} /> : <>
+      {showImage ? <>
+        <img className={`product-real-image product-real-image-${product.category}`} src={imageSrc} alt={product.name} onError={() => setImageFailed(true)} />
+        {product.category === "Wax" && <span className="product-image-caption">Imagem meramente ilustrativa</span>}
+      </> : <>
         <div className="visual-glow" />
         <div className="visual-shadow" />
         <div className="visual-jar visual-jar-wide">
