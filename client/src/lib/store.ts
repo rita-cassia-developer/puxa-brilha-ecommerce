@@ -17,7 +17,7 @@ export type Product = {
 
 export type Cart = Record<string, number>;
 
-const PRODUCTS_KEY = "puxa-e-brilha-products-v1";
+const PRODUCTS_KEY = "puxa-e-brilha-products-v2";
 const CART_KEY = "puxa-e-brilha-cart-v1";
 
 export const categories: Array<"Todos" | Category> = ["Todos", "Wax", "TongueDepressor", "DepilatoryStrips"];
@@ -32,7 +32,7 @@ const seeds: Record<Category, Seed[]> = {
       description: "Cera de morango que deixa a pele lisa e brilhosa, ideal para clínicas e profissionais de beleza.",
       price: 100,
       weightKg: 1.4,
-      stock: 0,
+      stock: 100,
       accent: "rose",
       note: "Cera de morango para uma pele lisa e brilhosa",
       badge: "Produto inicial",
@@ -44,7 +44,7 @@ const seeds: Record<Category, Seed[]> = {
       imageUrl: "/brand/abaixador-padrao-final.jpg",
       description: "Abaixador de língua para apoiar a rotina profissional de beleza.",
       price: 14.9,
-      stock: 0,
+      stock: 100,
       accent: "sand",
       note: "Abaixador de língua Puxa & Brilha",
     },
@@ -55,7 +55,7 @@ const seeds: Record<Category, Seed[]> = {
       imageUrl: "/brand/lenco-padrao-final-quadrado.jpg",
       description: "Tiras de depilação para um atendimento prático e organizado.",
       price: 31.9,
-      stock: 0,
+      stock: 100,
       accent: "clay",
       note: "Tiras de depilação Puxa & Brilha",
     },
