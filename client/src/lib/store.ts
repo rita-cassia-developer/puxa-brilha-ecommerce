@@ -28,6 +28,7 @@ const seeds: Record<Category, Seed[]> = {
   Wax: [
     {
       name: "Puxa & Brilha — Cera de Morango",
+      imageUrl: "/brand/puxa-e-brilha-cera-morango-square.jpeg",
       description: "Cera de morango que deixa a pele lisa e brilhosa, ideal para clínicas e profissionais de beleza.",
       price: 100,
       weightKg: 1.4,
@@ -40,6 +41,7 @@ const seeds: Record<Category, Seed[]> = {
   TongueDepressor: [
     {
       name: "Abaixador de língua",
+      imageUrl: "/brand/abaixador-padrao-final.jpg",
       description: "Abaixador de língua para apoiar a rotina profissional de beleza.",
       price: 14.9,
       stock: 0,
@@ -50,6 +52,7 @@ const seeds: Record<Category, Seed[]> = {
   DepilatoryStrips: [
     {
       name: "Tiras de depilação",
+      imageUrl: "/brand/lenco-padrao-final-quadrado.jpg",
       description: "Tiras de depilação para um atendimento prático e organizado.",
       price: 31.9,
       stock: 0,
