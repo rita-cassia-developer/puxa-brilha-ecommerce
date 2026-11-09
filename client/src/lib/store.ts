@@ -41,7 +41,7 @@ const seeds: Record<Category, Seed[]> = {
   TongueDepressor: [
     {
       name: "Abaixador de língua",
-      imageUrl: "/brand/abaixador-padrao-final.jpg",
+      imageUrl: "/brand/abaixador-padrao-final-sem-frase.png",
       description: "Abaixador de língua para apoiar a rotina profissional de beleza.",
       price: 14.9,
       stock: 100,
@@ -52,7 +52,7 @@ const seeds: Record<Category, Seed[]> = {
   DepilatoryStrips: [
     {
       name: "Tiras de depilação",
-      imageUrl: "/brand/lenco-padrao-final-quadrado.jpg",
+      imageUrl: "/brand/lenco-padrao-final-sem-frase.png",
       description: "Tiras de depilação para um atendimento prático e organizado.",
       price: 31.9,
       stock: 100,
