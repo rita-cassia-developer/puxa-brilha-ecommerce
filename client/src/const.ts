@@ -2,6 +2,14 @@ import { OAUTH_STATE_COOKIE, encodeOAuthState } from "@shared/const";
 
 export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 
+// O acesso principal da loja usa e-mail/senha. O OAuth legado continua disponível
+// separadamente e suas sessões existentes permanecem aceitas pelo servidor.
+export const startLogin = (returnPath = window.location.pathname) => {
+  if (returnPath.startsWith("/admin")) window.location.assign("/admin");
+  else if (returnPath.startsWith("/vendedor")) window.location.assign("/vendedor");
+  else if (window.location.pathname !== "/cliente") window.location.assign("/cliente?acesso=entrar");
+};
+
 // Start the Manus OAuth login. Call this from an event handler or effect at the
 // moment you want to navigate, e.g. `onClick={() => startLogin()}`.
 //
@@ -12,7 +20,7 @@ export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 // call would desync it from an in-flight login and the callback would reject it
 // with "invalid oauth state". It returns void by design, so there is no URL to
 // stash across renders.
-export const startLogin = (returnPath = window.location.pathname) => {
+export const startManusLogin = (returnPath = window.location.pathname) => {
   const oauthPortalUrl = window.__MANUS_CONFIG__?.oauthPortalUrl;
   const appId = window.__MANUS_CONFIG__?.projectId;
   if (!oauthPortalUrl || !appId) throw new Error("Manus login is not configured");

@@ -899,3 +899,48 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
 .review-stars { color: #6b3a00 !important; }
 .whatsapp-float { background: #075a37 !important; }
 .whatsapp-float:hover { background: #06472c !important; }
+
+/* Confirmação de carrinho destacada, sem abrir o drawer automaticamente. */
+[data-sonner-toast].cart-success-toast {
+  background: #fff8fa !important;
+  color: #481727 !important;
+  border: 2px solid #8d123e !important;
+  box-shadow: 0 12px 36px rgba(72, 23, 39, .24) !important;
+  padding: 20px !important;
+  gap: 14px !important;
+}
+[data-sonner-toast].cart-success-toast [data-title] { font-size: 16px; font-weight: 800; }
+[data-sonner-toast].cart-success-toast [data-description] { color: #6f293b !important; font-size: 13px; }
+[data-sonner-toast].cart-success-toast [data-icon] { width: 26px; height: 26px; color: #8d123e; }
+[data-sonner-toast].cart-success-toast [data-button] { background: #7d0b38 !important; color: #fff !important; min-height: 38px; font-weight: 700; }
+[data-sonner-toast].cart-success-toast button:focus-visible { outline: 3px solid #7d0b38; outline-offset: 3px; }
+
+/* O único menu sanduíche reúne apenas os quatro acessos profissionais. */
+.professional-menu-anchor { position: relative; flex: 0 0 auto; }
+.professional-menu-toggle { display: inline-flex !important; align-items: center; justify-content: center; width: 42px; height: 42px; color: #7d0b38; border: 1px solid #e7c6cd; border-radius: 4px; background: #fff8fa; }
+.professional-login-menu { position: absolute; top: calc(100% + 12px); left: 0; z-index: 70; width: min(310px, calc(100vw - 32px)); padding: 18px; border: 1px solid #e7c6cd; border-radius: 8px; background: #fff; box-shadow: 0 14px 40px rgba(72, 23, 39, .18); }
+.professional-menu-heading { display: flex; align-items: center; gap: 8px; color: #481727; font-size: 15px; font-weight: 800; }
+.professional-login-menu p { margin: 6px 0 12px; color: #6f293b; font-size: 12px; line-height: 1.5; }
+.professional-login-menu a { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 9px 10px; color: #6f293b; font-size: 14px; font-weight: 700; border-radius: 4px; }
+.professional-login-menu a span { flex: 1; }
+.professional-login-menu a:hover { background: #fff0f5; }
+.professional-login-menu a:focus-visible { outline: 3px solid #7d0b38; outline-offset: 2px; }
+.customer-login-benefit { display: block; max-width: 430px; margin: 16px auto 0; color: #6f293b; font-size: 12px; line-height: 1.65; }
+
+/* Acesso real por e-mail e senha da loja. */
+.store-login-form-wrap { width: 100%; margin: 18px auto 0; }
+.store-login-form { display: grid; gap: 14px; text-align: left; }
+.store-login-form label { display: grid; gap: 7px; color: #481727; font-size: 13px; font-weight: 700; }
+.store-login-form input { width: 100%; min-height: 46px; padding: 10px 12px; border: 1px solid #b58c9b; border-radius: 4px; background: #fff; color: #481727; font: 400 16px/1.4 Inter, sans-serif; }
+.store-login-form input:focus-visible, .store-login-form button:focus-visible, .store-auth-modes button:focus-visible { outline: 3px solid #7d0b38; outline-offset: 3px; }
+.store-password-field { position: relative; display: block; }
+.store-password-field input { padding-right: 48px; }
+.store-password-field button { position: absolute; top: 0; right: 0; width: 44px; height: 46px; display: grid; place-items: center; color: #6f293b; background: transparent; }
+.store-auth-modes { display: flex; gap: 8px; margin-bottom: 18px; }
+.store-auth-modes button { flex: 1; min-height: 42px; padding: 8px; border: 1px solid #b58c9b; border-radius: 4px; font-weight: 700; color: #6f293b; background: #fff; }
+.store-auth-modes button[aria-pressed="true"] { color: #fff; background: #6f293b; }
+.store-auth-help { color: #6f293b !important; font-size: 12px !important; line-height: 1.6 !important; margin: 0 !important; }
+.store-auth-help a { text-decoration: underline; font-weight: 700; }
+.store-auth-notice, .store-auth-error { padding: 12px; border: 1px solid #b58c9b; border-radius: 4px; color: #481727 !important; background: #fff0f5; font-size: 13px !important; line-height: 1.5 !important; margin-bottom: 12px !important; }
+.store-auth-submit { width: 100%; min-height: 46px; justify-content: center; }
+.store-auth-submit:disabled { opacity: .65; cursor: not-allowed; }
