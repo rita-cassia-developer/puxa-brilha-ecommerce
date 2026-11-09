@@ -8,6 +8,7 @@ import { publicPlatformScript } from "./publicConfig";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { registerStoreAuthRoutes, localMutationOriginGuard } from "../storeAuthRoutes";
 
 async function startServer() {
   const app = express();
@@ -29,6 +30,8 @@ async function startServer() {
     res.set("Cache-Control", "no-store").sendFile(path.resolve(process.cwd(), "public", "manus-routes.json"));
   });
   registerOAuthRoutes(app);
+  registerStoreAuthRoutes(app);
+  app.use("/api/trpc", localMutationOriginGuard);
   // tRPC API
   app.use(
     "/api/trpc",
