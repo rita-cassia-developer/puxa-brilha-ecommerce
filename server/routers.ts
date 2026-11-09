@@ -4,6 +4,8 @@ import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, customerProcedure, publicProcedure, router, vendorProcedure } from "./_core/trpc";
 import { createManualVendor, createOrder, createProduct, deleteOrder, deleteProduct, ensureOwnReferralLink, ensureReferralLink, getOrderDetail, getVendorDashboard, listCommissions, listCustomerOrders, listLeads, listOrders, listProducts, listVendors, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
+import { createPartnerInvitation, revokeLocalSession, StoreAuthError } from "./storeAuth";
 
 const productInput = z.object({
   name: z.string().trim().min(1).max(180),
@@ -29,9 +31,12 @@ export const appRouter = router({
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
-    logout: publicProcedure.mutation(({ ctx }) => {
+    logout: publicProcedure.mutation(async ({ ctx }) => {
+      let revoked = true;
+      try { await revokeLocalSession(ctx.req); } catch { revoked = false; }
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      if (!revoked) return { success: true, warning: "A sessão foi encerrada neste navegador, mas a revogação no servidor precisa ser verificada quando o banco voltar." } as const;
       return {
         success: true,
       } as const;
@@ -113,6 +118,10 @@ export const appRouter = router({
 
   partners: router({
     vendors: adminProcedure.query(() => listVendors()),
+    inviteAccess: adminProcedure.input(z.object({ vendorId: z.number().int().positive() }).strict()).mutation(async ({ input }) => {
+      try { return await createPartnerInvitation(input.vendorId); }
+      catch (error) { throw new TRPCError({ code: "BAD_REQUEST", message: error instanceof StoreAuthError ? error.message : "Não foi possível ativar o acesso. Confira as tabelas de login na hospedagem." }); }
+    }),
     createVendor: adminProcedure.input(z.object({ displayName: z.string().trim().min(2).max(160), email: z.string().trim().email(), phone: z.string().max(40).optional(), partnerType: z.enum(["representative", "vendor", "distributor"]).default("vendor"), commissionValue: z.coerce.number().min(0).max(100) })).mutation(({ input }) => createManualVendor(input)),
     generateLink: adminProcedure.input(z.object({ vendorId: z.number().int().positive() })).mutation(({ input }) => ensureReferralLink(input.vendorId)),
     leads: adminProcedure.query(() => listLeads()),
