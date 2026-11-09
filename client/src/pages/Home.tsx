@@ -1,11 +1,10 @@
 import { ProductVisual } from "@/components/ProductVisual";
 import { calculateShipping, formatCurrency, loadCart, loadProducts, saveCart, type Cart, type Product } from "@/lib/store";
 import { ArrowRight, BriefcaseBusiness, Check, ChevronDown, CreditCard, Heart, HelpCircle, Instagram, LockKeyhole, MapPin, Menu, Minus, PackageCheck, Plus, Search, ShieldCheck, ShoppingBag, Star, Store, Truck, UserRound, Users, X, Zap, MessageCircle } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
-import { startLogin } from "@/const";
 
 const categoryLinks = ["Todas as categorias", "Cera de depilação", "Abaixador de língua", "Tiras de depilação", "Ofertas"];
 const categoryMap: Record<string, Product["category"] | "Todos"> = { "Cera de depilação": "Wax", "Abaixador de língua": "TongueDepressor", "Tiras de depilação": "DepilatoryStrips" };
@@ -16,19 +15,48 @@ const HELP_WHATSAPP_URL = "https://wa.me/5534984241133?text=Ol%C3%A1%2C%20precis
 
 function Header({ count, onCart, onSearch, onCategory }: { count: number; onCart: () => void; onSearch: (value: string) => void; onCategory: (category: Product["category"] | "Todos") => void }) {
   const [search, setSearch] = useState("");
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [professionalOpen, setProfessionalOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<Product["category"] | "Todos">("Todos");
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const selectCategory = (category: Product["category"] | "Todos") => { setActiveCategory(category); onCategory(category); };
-  const submitSearch = (event: React.FormEvent) => { event.preventDefault(); onSearch(search); setMobileOpen(false); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); };
-  const closeMenu = () => setMobileOpen(false);
-  const openProfessionalLogin = (profile: "admin" | "representative" | "vendor" | "distributor") => { sessionStorage.setItem("puxa-brilha-login-profile", profile); startLogin(profile === "admin" ? "/admin" : "/vendedor"); };
+  const closeMenu = () => setProfessionalOpen(false);
+  const submitSearch = (event: React.FormEvent) => { event.preventDefault(); onSearch(search); closeMenu(); document.getElementById("produtos")?.scrollIntoView({ behavior: "smooth" }); };
+  useEffect(() => {
+    if (!professionalOpen) return;
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setProfessionalOpen(false); menuButtonRef.current?.focus(); }
+    };
+    const outside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) setProfessionalOpen(false);
+    };
+    document.addEventListener("keydown", escape);
+    document.addEventListener("mousedown", outside);
+    return () => { document.removeEventListener("keydown", escape); document.removeEventListener("mousedown", outside); };
+  }, [professionalOpen]);
+  const profiles = [
+    { id: "representative", label: "Representante", icon: Users, path: "/vendedor?perfil=representative" },
+    { id: "vendor", label: "Vendedor", icon: BriefcaseBusiness, path: "/vendedor?perfil=vendor" },
+    { id: "distributor", label: "Distribuidor", icon: Store, path: "/vendedor?perfil=distributor" },
+    { id: "admin", label: "Administrador", icon: ShieldCheck, path: "/admin" },
+  ] as const;
   return <>
     <div className="market-topline"><div className="market-container market-topline-inner"><span>Compra segura, entrega rastreada e atendimento humanizado</span><span className="topline-right"><a href={HELP_WHATSAPP_URL} target="_blank" rel="noreferrer">Central de ajuda</a></span></div></div>
     <header className="market-header">
-      <div className="market-container header-row"><button className="market-mobile-menu" onClick={() => setMobileOpen(value => !value)} aria-label={mobileOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={mobileOpen} aria-controls="mobile-menu-panel"><Menu size={21} /></button><Link href="/" className="market-logo" onClick={closeMenu}><img className="brand-logo brand-logo-header" src="/brand/rotulo-morangos-cera-liquida.png" alt="Logo original Cera Puxa & Brilha, com morangos e cera líquida" /></Link><form className="market-search" onSubmit={submitSearch}><input aria-label="Buscar produtos" value={search} onChange={event => setSearch(event.target.value)} placeholder="Busque produtos, marcas e categorias" /><button aria-label="Buscar"><Search size={20} /></button></form><div className="market-actions"><Link href="/cliente" className="market-account" onClick={closeMenu}><UserRound size={19} /><span><small>Minha conta</small><b>Entrar ou criar conta</b></span><ChevronDown size={14} /></Link><button className="market-cart" onClick={onCart} aria-label={`Carrinho com ${count} itens`}><ShoppingBag size={21} /><span>{count}</span></button></div></div>
-      <nav className="category-nav" aria-label="Navegação por categorias"><div className="market-container category-nav-inner"><button className={`category-menu ${activeCategory === "Todos" ? "active" : ""}`} onClick={() => selectCategory("Todos")}><Menu size={16} /> Todas as categorias</button>{categoryLinks.slice(1).map(category => { const value = category === "Ofertas" ? "Todos" : categoryMap[category] ?? "Todos"; return <a key={category} className={activeCategory === value && category !== "Ofertas" ? "active" : ""} href="#produtos" onClick={() => selectCategory(value)}>{category}</a>; })}<span className="category-spacer" /><span className="category-promise"><ShieldCheck size={15} /> Compra protegida Puxa & Brilha</span></div></nav>
-      {mobileOpen && <div id="mobile-menu-panel" className="mobile-menu-panel"><div className="market-container"><Link href="/cliente" className="mobile-admin-link" onClick={closeMenu}><UserRound size={17} /><span><small>Minha conta</small><b>Entrar ou criar conta</b></span><ArrowRight size={16} /></Link><button type="button" className="mobile-admin-link mobile-professional-link" onClick={() => setProfessionalOpen(value => !value)}><LockKeyhole size={17} /><span><small>Acesso restrito</small><b>Área profissional</b></span><ChevronDown size={16} className={professionalOpen ? "menu-chevron-open" : ""} /></button>{professionalOpen && <div className="mobile-professional-options"><button type="button" onClick={() => openProfessionalLogin("admin")}><ShieldCheck size={15} /> Administradora</button><button type="button" onClick={() => openProfessionalLogin("representative")}><Users size={15} /> Representante</button><button type="button" onClick={() => openProfessionalLogin("vendor")}><BriefcaseBusiness size={15} /> Vendedor</button><button type="button" onClick={() => openProfessionalLogin("distributor")}><Store size={15} /> Distribuidor</button></div>}<span className="mobile-menu-label">Navegar por categoria</span>{categoryLinks.slice(1).map(category => { const value = category === "Ofertas" ? "Todos" : categoryMap[category] ?? "Todos"; return <a key={category} className={activeCategory === value && category !== "Ofertas" ? "active" : ""} href="#produtos" onClick={() => { selectCategory(value); closeMenu(); }}>{category}<ArrowRight size={14} /></a>; })}</div></div>}
+      <div className="market-container header-row">
+        <div className="professional-menu-anchor" ref={menuRef}>
+          <button type="button" className="market-mobile-menu professional-menu-toggle" ref={menuButtonRef} onClick={() => setProfessionalOpen(value => !value)} aria-label={professionalOpen ? "Fechar acessos profissionais" : "Abrir acessos profissionais"} aria-expanded={professionalOpen} aria-controls="professional-menu-panel"><Menu size={21} /></button>
+          {professionalOpen && <nav id="professional-menu-panel" className="professional-login-menu" aria-label="Acessos profissionais">
+            <span className="professional-menu-heading"><LockKeyhole size={16} /> Área profissional</span>
+            <p>Acesso exclusivo para profissionais cadastrados.</p>
+            {profiles.map(({ id, label, icon: Icon, path }) => <Link key={id} href={path} onClick={() => { sessionStorage.setItem("puxa-brilha-login-profile", id); closeMenu(); }}><Icon size={18} /><span>{label}</span><ArrowRight size={16} /></Link>)}
+          </nav>}
+        </div>
+        <Link href="/" className="market-logo" onClick={closeMenu}><img className="brand-logo brand-logo-header" src="/brand/rotulo-morangos-cera-liquida.png" alt="Logo original Cera Puxa & Brilha, com morangos e cera líquida" /></Link>
+        <form className="market-search" onSubmit={submitSearch}><input aria-label="Buscar produtos" value={search} onChange={event => setSearch(event.target.value)} placeholder="Busque produtos, marcas e categorias" /><button aria-label="Buscar"><Search size={20} /></button></form>
+        <div className="market-actions"><Link href="/cliente" className="market-account" onClick={closeMenu}><UserRound size={19} /><span><small>Minha conta</small><b>Entrar ou criar conta</b></span><ChevronDown size={14} /></Link><button className="market-cart" onClick={onCart} aria-label={`Carrinho com ${count} itens`}><ShoppingBag size={21} /><span>{count}</span></button></div>
+      </div>
+      <nav className="category-nav" aria-label="Navegação por categorias"><div className="market-container category-nav-inner"><button className={`category-menu ${activeCategory === "Todos" ? "active" : ""}`} onClick={() => selectCategory("Todos")}><ChevronDown size={16} /> Todas as categorias</button>{categoryLinks.slice(1).map(category => { const value = category === "Ofertas" ? "Todos" : categoryMap[category] ?? "Todos"; return <a key={category} className={activeCategory === value && category !== "Ofertas" ? "active" : ""} href="#produtos" onClick={() => selectCategory(value)}>{category}</a>; })}<span className="category-spacer" /><span className="category-promise"><ShieldCheck size={15} /> Compra protegida Puxa & Brilha</span></div></nav>
     </header>
   </>;
 }
@@ -151,11 +179,17 @@ export default function Home() {
   const cartCount = Object.values(cart).reduce((sum, value) => sum + value, 0);
   const addToCart = (product: Product) => {
     if (product.stock <= 0) { toast.error("Este produto está sem estoque no momento."); return; }
-    setCart(prev => {
-      const nextQuantity = (prev[product.id] ?? 0) + 1;
-      if (nextQuantity > product.stock) { toast.info(`Há apenas ${product.stock} unidade(s) disponível(is).`); return prev; }
-      toast.success(`${product.name} foi adicionado ao carrinho.`);
-      return { ...prev, [product.id]: nextQuantity };
+    if ((cart[product.id] ?? 0) >= product.stock) { toast.info(`Há apenas ${product.stock} unidade(s) disponível(is).`); return; }
+    setCart(prev => ({ ...prev, [product.id]: Math.min((prev[product.id] ?? 0) + 1, product.stock) }));
+    toast.success("Produto adicionado ao carrinho!", {
+      id: "cart-added",
+      description: product.name,
+      position: "top-center",
+      duration: 6000,
+      closeButton: true,
+      icon: <ShoppingBag size={24} aria-hidden="true" />,
+      className: "cart-success-toast",
+      action: { label: "Ver carrinho", onClick: () => setCartOpen(true) },
     });
   };
   const changeCart = (id: string, delta: number) => setCart(prev => {
