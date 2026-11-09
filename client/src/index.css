@@ -815,7 +815,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
   padding: 16px;
   object-fit: contain;
   object-position: center;
-  transform: none;
+  transform: scale(1.2);
 }
 
 /* Rodapé final — fundo claro com textos no vermelho-vinho da marca */
