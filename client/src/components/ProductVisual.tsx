@@ -10,7 +10,7 @@ export function ProductVisual({ product, compact = false }: { product: Product; 
     <div className={`product-visual product-visual-${product.accent} ${compact ? "product-visual-compact" : ""}`} aria-label={`Visual ilustrativo de ${product.name}`}>
       {showImage ? <>
         <img className={`product-real-image product-real-image-${product.category}`} src={imageSrc} alt={product.name} onError={() => setImageFailed(true)} />
-        <span className="product-image-caption">Imagem meramente ilustrativa</span>
+        {product.category !== "Wax" && <span className="product-image-caption">Imagem meramente ilustrativa</span>}
       </> : <>
         <div className="visual-glow" />
         <div className="visual-shadow" />
