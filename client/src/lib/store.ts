@@ -28,7 +28,7 @@ const seeds: Record<Category, Seed[]> = {
   Wax: [
     {
       name: "Puxa & Brilha — Cera de Morango",
-      imageUrl: "/brand/pote-padrao-final-quadrado-maior-sem-frase-enquadrado.png",
+      imageUrl: "/brand/pote-padrao-final-enquadramento-ajuste-fino.png",
       description: "Cera de morango que deixa a pele lisa e brilhosa, ideal para clínicas e profissionais de beleza.",
       price: 100,
       weightKg: 1.4,
