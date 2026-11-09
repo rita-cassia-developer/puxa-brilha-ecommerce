@@ -18,7 +18,17 @@ const productInput = z.object({
   note: z.string().trim().max(160).optional().nullable(),
   stock: z.coerce.number().int().min(0),
   weightGrams: z.coerce.number().int().min(0),
-  imageUrl: z.string().url().max(500).optional().nullable(),
+  imageUrl: z.string().trim().max(500).refine(value => {
+    if (value.startsWith("/brand/")) {
+      return /^\/brand\/(?:[A-Za-z0-9_-][A-Za-z0-9._-]*\/)*[A-Za-z0-9_-][A-Za-z0-9._-]*$/.test(value);
+    }
+    try {
+      const url = new URL(value);
+      return url.protocol === "https:" && !url.username && !url.password;
+    } catch {
+      return false;
+    }
+  }, { message: "Use uma URL HTTPS ou um caminho local válido iniciado por /brand/." }).optional().nullable(),
   status: z.enum(["draft", "active", "archived"]).default("active"),
 });
 
