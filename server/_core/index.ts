@@ -1,5 +1,5 @@
 import "dotenv/config";
-import express from "express";
+import express, { type Request } from "express";
 import { createServer } from "http";
 import path from "path";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
@@ -9,6 +9,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { registerStoreAuthRoutes, localMutationOriginGuard } from "../storeAuthRoutes";
+import { registerMercadoPagoRoutes } from "../mercadoPago";
 
 async function startServer() {
   const app = express();
@@ -20,7 +21,7 @@ async function startServer() {
     res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
     next();
   });
-  app.use(express.json({ limit: "1mb" }));
+  app.use(express.json({ limit: "1mb", verify: (req, _res, buffer) => { (req as Request & { rawBody?: Buffer }).rawBody = Buffer.from(buffer); } }));
   app.use(express.urlencoded({ limit: "1mb", extended: true }));
   app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
   app.get("/api/platform/config.js", (_req, res) => {
@@ -31,6 +32,7 @@ async function startServer() {
   });
   registerOAuthRoutes(app);
   registerStoreAuthRoutes(app);
+  registerMercadoPagoRoutes(app);
   app.use("/api/trpc", localMutationOriginGuard);
   // tRPC API
   app.use(
