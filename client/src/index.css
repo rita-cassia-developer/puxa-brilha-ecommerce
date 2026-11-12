@@ -900,7 +900,8 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
 .whatsapp-float { background: #075a37 !important; }
 .whatsapp-float:hover { background: #06472c !important; }
 
-/* Confirmação de carrinho destacada, sem abrir o drawer automaticamente. */
+/* Todas as notificações ficam destacadas, legíveis e no topo da tela. */
+[data-sonner-toast].site-toast,
 [data-sonner-toast].cart-success-toast {
   background: #fff8fa !important;
   color: #481727 !important;
@@ -909,11 +910,11 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
   padding: 20px !important;
   gap: 14px !important;
 }
-[data-sonner-toast].cart-success-toast [data-title] { font-size: 16px; font-weight: 800; }
-[data-sonner-toast].cart-success-toast [data-description] { color: #6f293b !important; font-size: 13px; }
-[data-sonner-toast].cart-success-toast [data-icon] { width: 26px; height: 26px; color: #8d123e; }
-[data-sonner-toast].cart-success-toast [data-button] { background: #7d0b38 !important; color: #fff !important; min-height: 38px; font-weight: 700; }
-[data-sonner-toast].cart-success-toast button:focus-visible { outline: 3px solid #7d0b38; outline-offset: 3px; }
+[data-sonner-toast].site-toast [data-title], [data-sonner-toast].cart-success-toast [data-title] { font-size: 16px; font-weight: 800; }
+[data-sonner-toast].site-toast [data-description], [data-sonner-toast].cart-success-toast [data-description] { color: #6f293b !important; font-size: 13px; }
+[data-sonner-toast].site-toast [data-icon], [data-sonner-toast].cart-success-toast [data-icon] { width: 26px; height: 26px; color: #8d123e; }
+[data-sonner-toast].site-toast [data-button], [data-sonner-toast].cart-success-toast [data-button] { background: #7d0b38 !important; color: #fff !important; min-height: 38px; font-weight: 700; }
+[data-sonner-toast].site-toast button:focus-visible, [data-sonner-toast].cart-success-toast button:focus-visible { outline: 3px solid #7d0b38; outline-offset: 3px; }
 
 /* O único menu sanduíche reúne apenas os quatro acessos profissionais. */
 .professional-menu-anchor { position: relative; flex: 0 0 auto; }
