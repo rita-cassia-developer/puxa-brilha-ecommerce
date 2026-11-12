@@ -129,6 +129,11 @@ function Checkout({ cart, products, onClose, onClear, referralCode }: { cart: Ca
         cep: address.cep,
         address,
       });
+      if (result.checkoutUrl) {
+        toast.success("Pedido criado. Abrindo o pagamento seguro do Mercado Pago...");
+        window.location.assign(result.checkoutUrl);
+        return;
+      }
       setOrder(result.code);
       onClear();
       setStep("success");
