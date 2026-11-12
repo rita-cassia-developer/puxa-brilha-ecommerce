@@ -193,10 +193,16 @@ export async function createOrder(input: CreateOrderInput, customerUserId?: numb
     });
     const orderId = Number(inserted[0].insertId);
     for (const line of lines) {
-      const stockUpdate = await tx.update(products)
+      const stockBefore = await tx.select({ stock: products.stock }).from(products).where(eq(products.id, line.product.id)).limit(1);
+      const availableBefore = Number(stockBefore[0]?.stock ?? 0);
+      if (availableBefore < line.quantity) {
+        throw new Error(`Estoque insuficiente para ${line.product.name}`);
+      }
+      await tx.update(products)
         .set({ stock: sql`${products.stock} - ${line.quantity}` })
         .where(and(eq(products.id, line.product.id), eq(products.status, "active"), sql`${products.stock} >= ${line.quantity}`));
-      if (Number((stockUpdate as { affectedRows?: number }).affectedRows ?? 0) !== 1) {
+      const stockAfter = await tx.select({ stock: products.stock }).from(products).where(eq(products.id, line.product.id)).limit(1);
+      if (Number(stockAfter[0]?.stock ?? -1) !== availableBefore - line.quantity) {
         throw new Error(`Estoque insuficiente para ${line.product.name}`);
       }
     }
