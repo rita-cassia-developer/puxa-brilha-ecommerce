@@ -6,6 +6,7 @@ import { createManualVendor, createOrder, createProduct, deleteOrder, deleteProd
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createPartnerInvitation, revokeLocalSession, StoreAuthError } from "./storeAuth";
+import { createMercadoPagoOrder } from "./mercadoPago";
 
 const productInput = z.object({
   name: z.string().trim().min(1).max(180),
@@ -98,7 +99,20 @@ export const appRouter = router({
       paymentMethod: z.enum(["pix", "card", "boleto", "link"]),
       fulfillment: z.enum(["delivery", "pickup"]),
       referralCode: z.string().trim().max(32).optional(),
-    })).mutation(({ input, ctx }) => createOrder(input, ctx.user?.id)),
+    })).mutation(async ({ input, ctx }) => {
+      const created = await createOrder(input, ctx.user?.id);
+      const detail = await getOrderDetail(created.id);
+      let checkoutUrl: string | null = null;
+      try {
+        checkoutUrl = detail
+          ? await createMercadoPagoOrder({ code: created.code, total: created.total, customerEmail: detail.order.customerEmail, items: detail.items })
+          : null;
+      } catch (error) {
+        await updateOrderStatus(created.id, { paymentStatus: "rejected", orderStatus: "cancelled" });
+        throw error;
+      }
+      return { ...created, checkoutUrl };
+    }),
     list: adminProcedure.query(() => listOrders()),
     detail: adminProcedure.input(z.object({ id: z.number().int().positive() })).query(({ input }) => getOrderDetail(input.id)),
     updateStatus: adminProcedure.input(z.object({

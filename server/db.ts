@@ -242,6 +242,13 @@ export async function getOrderDetail(id: number) {
   return { order: order[0], items, vendor: vendor[0] ?? null };
 }
 
+export async function getOrderByCode(code: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  const rows = await db.select().from(orders).where(eq(orders.code, code)).limit(1);
+  return rows[0] ?? null;
+}
+
 export async function updateOrderStatus(id: number, input: { paymentStatus?: "pending" | "approved" | "rejected" | "refunded"; orderStatus?: "pending" | "paid" | "processing" | "shipped" | "ready_pickup" | "completed" | "cancelled" }) {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
