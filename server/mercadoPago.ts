@@ -15,6 +15,7 @@ function publicOrigin() {
 export async function createMercadoPagoOrder(input: {
   code: string;
   total: number;
+  shipping: number;
   customerEmail?: string | null;
   items: Array<{ productName: string; quantity: number; unitPrice: string | number }>;
 }) {
@@ -35,7 +36,10 @@ export async function createMercadoPagoOrder(input: {
       total_amount: input.total.toFixed(2),
       external_reference: input.code,
       ...(input.customerEmail ? { payer: { email: input.customerEmail } } : {}),
-      items: input.items.map(item => ({ title: item.productName, quantity: item.quantity, unit_price: Number(item.unitPrice).toFixed(2) })),
+      items: [
+        ...input.items.map(item => ({ title: item.productName, quantity: item.quantity, unit_price: Number(item.unitPrice).toFixed(2) })),
+        ...(input.shipping > 0 ? [{ title: "Frete", quantity: 1, unit_price: input.shipping.toFixed(2) }] : []),
+      ],
       ...(publicOrigin() ? { config: { online: {
         success_url: `${publicOrigin()}/?pagamento=sucesso`,
         failure_url: `${publicOrigin()}/?pagamento=falhou`,

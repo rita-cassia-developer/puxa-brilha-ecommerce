@@ -105,7 +105,7 @@ export const appRouter = router({
       let checkoutUrl: string | null = null;
       try {
         checkoutUrl = detail
-          ? await createMercadoPagoOrder({ code: created.code, total: created.total, customerEmail: detail.order.customerEmail, items: detail.items })
+          ? await createMercadoPagoOrder({ code: created.code, total: created.total, shipping: Number(detail.order.shipping), customerEmail: detail.order.customerEmail, items: detail.items })
           : null;
       } catch (error) {
         await updateOrderStatus(created.id, { paymentStatus: "rejected", orderStatus: "cancelled" });
