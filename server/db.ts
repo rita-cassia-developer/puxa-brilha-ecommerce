@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, like, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, like, lte, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, commissions, leads, orderItems, orders, products, referralLinks, referralVisits, users, vendors } from "../drizzle/schema";
 import { ENV } from "./_core/env";
@@ -274,6 +274,33 @@ export async function updateOrderStatus(id: number, input: { paymentStatus?: "pe
   });
   const updated = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
   return updated[0];
+}
+
+/** Cancels unpaid pending orders after the reservation window and releases stock once. */
+export async function cancelExpiredPendingOrders(maxAgeHours = 48) {
+  const db = await getDb();
+  if (!db) return 0;
+  const cutoff = new Date(Date.now() - maxAgeHours * 60 * 60 * 1000);
+  let cancelled = 0;
+  await db.transaction(async tx => {
+    const expired = await tx.select({ id: orders.id }).from(orders).where(and(
+      eq(orders.orderStatus, "pending"),
+      eq(orders.paymentStatus, "pending"),
+      lte(orders.createdAt, cutoff),
+    ));
+    for (const order of expired) {
+      const updated = await tx.update(orders)
+        .set({ orderStatus: "cancelled" })
+        .where(and(eq(orders.id, order.id), eq(orders.orderStatus, "pending"), eq(orders.paymentStatus, "pending")));
+      if ((updated as unknown as { affectedRows?: number }).affectedRows !== 1) continue;
+      const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, order.id));
+      for (const item of items) {
+        await tx.update(products).set({ stock: sql`${products.stock} + ${item.quantity}` }).where(eq(products.id, item.productId));
+      }
+      cancelled += 1;
+    }
+  });
+  return cancelled;
 }
 
 export async function deleteOrder(id: number) {
