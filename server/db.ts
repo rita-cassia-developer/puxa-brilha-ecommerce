@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, like, lte, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, like, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, commissions, leads, orderItems, orders, products, referralLinks, referralVisits, users, vendors } from "../drizzle/schema";
 import { ENV } from "./_core/env";
@@ -192,20 +192,6 @@ export async function createOrder(input: CreateOrderInput, customerUserId?: numb
       customerUserId: customerUserId ?? null, vendorId: referral[0]?.vendorId ?? null, referralCode: referral[0]?.code ?? null,
     });
     const orderId = Number(inserted[0].insertId);
-    for (const line of lines) {
-      const stockBefore = await tx.select({ stock: products.stock }).from(products).where(eq(products.id, line.product.id)).limit(1);
-      const availableBefore = Number(stockBefore[0]?.stock ?? 0);
-      if (availableBefore < line.quantity) {
-        throw new Error(`Estoque insuficiente para ${line.product.name}`);
-      }
-      await tx.update(products)
-        .set({ stock: sql`${products.stock} - ${line.quantity}` })
-        .where(and(eq(products.id, line.product.id), eq(products.status, "active"), sql`${products.stock} >= ${line.quantity}`));
-      const stockAfter = await tx.select({ stock: products.stock }).from(products).where(eq(products.id, line.product.id)).limit(1);
-      if (Number(stockAfter[0]?.stock ?? -1) !== availableBefore - line.quantity) {
-        throw new Error(`Estoque insuficiente para ${line.product.name}`);
-      }
-    }
     await tx.insert(orderItems).values(lines.map(line => ({ orderId, productId: line.product.id, productName: line.product.name, quantity: line.quantity, unitPrice: line.unitPrice.toFixed(2) })));
     if (referral[0] && subtotal > 0) {
       const vendor = await tx.select({ commissionType: vendors.commissionType, commissionValue: vendors.commissionValue }).from(vendors).where(eq(vendors.id, referral[0].vendorId)).limit(1);
@@ -261,13 +247,17 @@ export async function updateOrderStatus(id: number, input: { paymentStatus?: "pe
   const rows = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
   if (!rows[0]) throw new Error("Pedido não encontrado");
   const current = rows[0];
-  const releaseStock = (input.orderStatus === "cancelled" || input.paymentStatus === "rejected")
-    && current.orderStatus !== "cancelled" && current.paymentStatus !== "rejected";
+  const approveStock = input.paymentStatus === "approved" && current.paymentStatus !== "approved";
   await db.transaction(async tx => {
-    if (releaseStock) {
+    if (approveStock) {
       const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, id));
       for (const item of items) {
-        await tx.update(products).set({ stock: sql`${products.stock} + ${item.quantity}` }).where(eq(products.id, item.productId));
+        const result = await tx.update(products)
+          .set({ stock: sql`${products.stock} - ${item.quantity}` })
+          .where(and(eq(products.id, item.productId), eq(products.status, "active"), sql`${products.stock} >= ${item.quantity}`));
+        if ((result as unknown as { affectedRows?: number }).affectedRows !== 1) {
+          throw new Error(`Estoque insuficiente para ${item.productName}`);
+        }
       }
     }
     await tx.update(orders).set(input).where(eq(orders.id, id));
@@ -276,44 +266,11 @@ export async function updateOrderStatus(id: number, input: { paymentStatus?: "pe
   return updated[0];
 }
 
-/** Cancels unpaid pending orders after the reservation window and releases stock once. */
-export async function cancelExpiredPendingOrders(maxAgeHours = 48) {
-  const db = await getDb();
-  if (!db) return 0;
-  const cutoff = new Date(Date.now() - maxAgeHours * 60 * 60 * 1000);
-  let cancelled = 0;
-  await db.transaction(async tx => {
-    const expired = await tx.select({ id: orders.id }).from(orders).where(and(
-      eq(orders.orderStatus, "pending"),
-      eq(orders.paymentStatus, "pending"),
-      lte(orders.createdAt, cutoff),
-    ));
-    for (const order of expired) {
-      const updated = await tx.update(orders)
-        .set({ orderStatus: "cancelled" })
-        .where(and(eq(orders.id, order.id), eq(orders.orderStatus, "pending"), eq(orders.paymentStatus, "pending")));
-      if ((updated as unknown as { affectedRows?: number }).affectedRows !== 1) continue;
-      const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, order.id));
-      for (const item of items) {
-        await tx.update(products).set({ stock: sql`${products.stock} + ${item.quantity}` }).where(eq(products.id, item.productId));
-      }
-      cancelled += 1;
-    }
-  });
-  return cancelled;
-}
-
 export async function deleteOrder(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
   await db.transaction(async tx => {
     const order = await tx.select().from(orders).where(eq(orders.id, id)).limit(1);
-    if (order[0] && order[0].orderStatus !== "cancelled" && order[0].paymentStatus !== "rejected") {
-      const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, id));
-      for (const item of items) {
-        await tx.update(products).set({ stock: sql`${products.stock} + ${item.quantity}` }).where(eq(products.id, item.productId));
-      }
-    }
     await tx.delete(commissions).where(eq(commissions.orderId, id));
     await tx.delete(orderItems).where(eq(orderItems.orderId, id));
     await tx.delete(orders).where(eq(orders.id, id));
