@@ -10,6 +10,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { registerStoreAuthRoutes, localMutationOriginGuard } from "../storeAuthRoutes";
 import { registerMercadoPagoRoutes } from "../mercadoPago";
+import { cancelExpiredPendingOrders } from "../db";
 
 async function startServer() {
   const app = express();
@@ -53,6 +54,17 @@ async function startServer() {
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error("Invalid PORT");
   server.on("error", error => { console.error("Server failed:", error.message); process.exit(1); });
   server.listen(port, "0.0.0.0", () => console.log(`Server listening on port ${port}`));
+  const expirePendingOrders = async () => {
+    try {
+      const cancelled = await cancelExpiredPendingOrders(48);
+      if (cancelled > 0) console.log(`[Orders] ${cancelled} pedido(s) pendente(s) cancelado(s) após 48 horas`);
+    } catch (error) {
+      console.error("[Orders] Falha ao expirar pedidos pendentes:", error instanceof Error ? error.message : error);
+    }
+  };
+  void expirePendingOrders();
+  const expiryTimer = setInterval(expirePendingOrders, 60 * 60 * 1000);
+  expiryTimer.unref?.();
 }
 
 startServer().catch(error => { console.error(error); process.exit(1); });
