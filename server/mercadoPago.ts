@@ -48,9 +48,20 @@ export async function createMercadoPagoOrder(input: {
       } } } : {}),
     }),
   });
-  const data = await response.json().catch(() => ({})) as { id?: string; checkout_url?: string; message?: string; error?: string };
+  const data = await response.json().catch(() => ({})) as { checkout_url?: string; message?: string; error?: string };
   if (!response.ok || !data.checkout_url) throw new Error(data.message || data.error || "Não foi possível criar o checkout do Mercado Pago.");
-  return { id: data.id ?? null, checkoutUrl: data.checkout_url };
+  return data.checkout_url;
+}
+
+function confirmedPaymentMethod(remote: {
+  transactions?: { payments?: Array<{ payment_method?: { type?: string; id?: string }; payment_method_id?: string }> };
+}) {
+  const payment = remote.transactions?.payments?.[0];
+  const type = `${payment?.payment_method?.type ?? ""} ${payment?.payment_method?.id ?? ""} ${payment?.payment_method_id ?? ""}`.toLowerCase();
+  if (type.includes("pix") || type.includes("bank_transfer")) return "pix" as const;
+  if (type.includes("ticket") || type.includes("boleto")) return "boleto" as const;
+  if (type.includes("card") || type.includes("credit") || type.includes("debit")) return "card" as const;
+  return undefined;
 }
 
 function validSignature(req: Request) {
@@ -76,14 +87,15 @@ export function registerMercadoPagoRoutes(app: Express) {
     try {
       const response = await fetch(`${MP_API}/v1/orders/${encodeURIComponent(orderId)}`, { headers: { authorization: `Bearer ${token}` } });
       if (!response.ok) return res.status(502).json({ error: "Não foi possível consultar o pedido no Mercado Pago" });
-      const remote = await response.json() as { external_reference?: string; status?: string; status_detail?: string };
+      const remote = await response.json() as { external_reference?: string; status?: string; status_detail?: string; transactions?: { payments?: Array<{ payment_method?: { type?: string; id?: string }; payment_method_id?: string }> } };
       if (!remote.external_reference) return res.status(422).json({ error: "Pedido sem referência externa" });
       const local = await getOrderByCode(remote.external_reference);
       if (!local) return res.status(404).json({ error: "Pedido local não encontrado" });
       const approved = remote.status === "processed" || remote.status_detail === "accredited";
       const rejected = remote.status === "cancelled" || remote.status === "failed";
-      if (approved) await updateOrderStatus(local.id, { paymentStatus: "approved", orderStatus: "paid" });
-      else if (rejected) await updateOrderStatus(local.id, { paymentStatus: "rejected", orderStatus: "cancelled" });
+      const paymentMethod = confirmedPaymentMethod(remote);
+      if (approved) await updateOrderStatus(local.id, { ...(paymentMethod ? { paymentMethod } : {}), paymentStatus: "approved", orderStatus: "paid" });
+      else if (rejected) await updateOrderStatus(local.id, { ...(paymentMethod ? { paymentMethod } : {}), paymentStatus: "rejected", orderStatus: "cancelled" });
       return res.sendStatus(200);
     } catch (error) {
       console.error("Mercado Pago webhook processing failed:", error instanceof Error ? error.message : error);

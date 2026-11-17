@@ -152,7 +152,6 @@ type CreateOrderInput = {
   paymentMethod: "pix" | "card" | "boleto" | "link";
   fulfillment: "delivery" | "pickup";
   referralCode?: string;
-  checkoutRequestId: string;
 };
 
 function shippingForCep(cep: string) {
@@ -169,8 +168,6 @@ export async function createOrder(input: CreateOrderInput, customerUserId?: numb
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
   if (!input.items.length) throw new Error("O carrinho está vazio");
-  const existing = await db.select().from(orders).where(eq(orders.checkoutRequestId, input.checkoutRequestId)).limit(1);
-  if (existing[0]) return { id: existing[0].id, code: existing[0].code, subtotal: Number(existing[0].subtotal), shipping: Number(existing[0].shipping), total: Number(existing[0].total), reused: true as const };
   const productIds = input.items.map(item => item.productId);
   const catalog = await db.select().from(products).where(inArray(products.id, productIds));
   const byId = new Map(catalog.map(product => [product.id, product]));
@@ -193,7 +190,6 @@ export async function createOrder(input: CreateOrderInput, customerUserId?: numb
       customerEmail: input.customerEmail?.trim() || null, customerPhone: input.customerPhone?.trim() || null,
       addressJson: input.address ? JSON.stringify(input.address) : null,
       customerUserId: customerUserId ?? null, vendorId: referral[0]?.vendorId ?? null, referralCode: referral[0]?.code ?? null,
-      checkoutRequestId: input.checkoutRequestId,
     });
     const orderId = Number(inserted[0].insertId);
     await tx.insert(orderItems).values(lines.map(line => ({ orderId, productId: line.product.id, productName: line.product.name, quantity: line.quantity, unitPrice: line.unitPrice.toFixed(2) })));
@@ -207,15 +203,7 @@ export async function createOrder(input: CreateOrderInput, customerUserId?: numb
     }
     return orderId;
   });
-  return { id: result, code, subtotal, shipping, total, reused: false as const };
-}
-
-export async function saveOrderCheckout(id: number, input: { mercadoPagoOrderId?: string | null; checkoutUrl?: string | null }) {
-  const db = await getDb();
-  if (!db) throw new Error("Database is not available");
-  await db.update(orders).set(input).where(eq(orders.id, id));
-  const rows = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
-  return rows[0] ?? null;
+  return { id: result, code, subtotal, shipping, total };
 }
 
 export async function listOrders() {
@@ -253,7 +241,7 @@ export async function getOrderByCode(code: string) {
   return rows[0] ?? null;
 }
 
-export async function updateOrderStatus(id: number, input: { paymentStatus?: "pending" | "approved" | "rejected" | "refunded"; orderStatus?: "pending" | "paid" | "processing" | "shipped" | "ready_pickup" | "completed" | "cancelled" }) {
+export async function updateOrderStatus(id: number, input: { paymentMethod?: "pix" | "card" | "boleto" | "link"; paymentStatus?: "pending" | "approved" | "rejected" | "refunded"; orderStatus?: "pending" | "paid" | "processing" | "shipped" | "ready_pickup" | "completed" | "cancelled" }) {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
   const rows = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
