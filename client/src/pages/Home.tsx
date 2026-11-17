@@ -111,6 +111,15 @@ function Checkout({ cart, products, onClose, onClear, referralCode }: { cart: Ca
   const [payment, setPayment] = useState("pix");
   const [order, setOrder] = useState("");
   const createOrder = trpc.orders.create.useMutation();
+  const [checkoutRequestId] = useState(() => {
+    const fingerprint = Object.entries(cart).filter(([, quantity]) => quantity > 0).sort(([a], [b]) => a.localeCompare(b)).map(([id, quantity]) => `${id}:${quantity}`).join("|");
+    const key = `puxa-checkout-request:${fingerprint || "empty"}`;
+    const existing = sessionStorage.getItem(key);
+    if (existing) return existing;
+    const created = `checkout-${crypto.randomUUID()}`;
+    sessionStorage.setItem(key, created);
+    return created;
+  });
   const items = products.filter(product => cart[product.id]);
   const subtotal = items.reduce((sum, product) => sum + product.price * (cart[product.id] ?? 0), 0);
   const total = subtotal + (shipping?.price ?? 0);
@@ -143,6 +152,7 @@ function Checkout({ cart, products, onClose, onClear, referralCode }: { cart: Ca
         paymentMethod: payment as "pix" | "card" | "boleto" | "link",
         fulfillment,
         referralCode,
+        checkoutRequestId,
         cep: address.cep,
         address,
       });
