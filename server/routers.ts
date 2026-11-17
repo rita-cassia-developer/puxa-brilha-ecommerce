@@ -2,7 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, customerProcedure, publicProcedure, router, vendorProcedure } from "./_core/trpc";
-import { createManualVendor, createOrder, createProduct, deleteOrder, deleteProduct, ensureOwnReferralLink, ensureReferralLink, getOrderDetail, getVendorDashboard, listCommissions, listCustomerOrders, listLeads, listOrders, listProducts, listVendors, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
+import { createManualVendor, createOrder, createProduct, deleteOrder, deleteProduct, ensureOwnReferralLink, ensureReferralLink, getOrderDetail, getVendorDashboard, listCommissions, listCustomerOrders, listLeads, listOrders, saveOrderCheckout, listProducts, listVendors, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createPartnerInvitation, revokeLocalSession, StoreAuthError } from "./storeAuth";
@@ -99,17 +99,20 @@ export const appRouter = router({
       paymentMethod: z.enum(["pix", "card", "boleto", "link"]),
       fulfillment: z.enum(["delivery", "pickup"]),
       referralCode: z.string().trim().max(32).optional(),
+      checkoutRequestId: z.string().trim().min(16).max(80),
     })).mutation(async ({ input, ctx }) => {
       const created = await createOrder(input, ctx.user?.id);
       const detail = await getOrderDetail(created.id);
-      let checkoutUrl: string | null = null;
-      try {
-        checkoutUrl = detail
-          ? await createMercadoPagoOrder({ code: created.code, total: created.total, shipping: Number(detail.order.shipping), customerEmail: detail.order.customerEmail, items: detail.items })
-          : null;
-      } catch (error) {
-        await updateOrderStatus(created.id, { paymentStatus: "rejected", orderStatus: "cancelled" });
-        throw error;
+      let checkoutUrl: string | null = detail?.order.checkoutUrl ?? null;
+      if (!checkoutUrl && detail) {
+        try {
+          const checkout = await createMercadoPagoOrder({ code: created.code, total: created.total, shipping: Number(detail.order.shipping), customerEmail: detail.order.customerEmail, items: detail.items });
+          checkoutUrl = checkout?.checkoutUrl ?? null;
+          if (checkout) await saveOrderCheckout(created.id, { mercadoPagoOrderId: checkout.id, checkoutUrl });
+        } catch (error) {
+          await updateOrderStatus(created.id, { paymentStatus: "rejected", orderStatus: "cancelled" });
+          throw error;
+        }
       }
       return { ...created, checkoutUrl };
     }),
