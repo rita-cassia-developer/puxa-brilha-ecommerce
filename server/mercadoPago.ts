@@ -48,9 +48,9 @@ export async function createMercadoPagoOrder(input: {
       } } } : {}),
     }),
   });
-  const data = await response.json().catch(() => ({})) as { checkout_url?: string; message?: string; error?: string };
+  const data = await response.json().catch(() => ({})) as { id?: string; checkout_url?: string; message?: string; error?: string };
   if (!response.ok || !data.checkout_url) throw new Error(data.message || data.error || "Não foi possível criar o checkout do Mercado Pago.");
-  return data.checkout_url;
+  return { id: data.id || `mp-${input.code}`, checkoutUrl: data.checkout_url };
 }
 
 function confirmedPaymentMethod(remote: {
