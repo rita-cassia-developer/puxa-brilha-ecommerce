@@ -255,7 +255,10 @@ export async function updateOrderStatus(id: number, input: { paymentStatus?: "pe
         const result = await tx.update(products)
           .set({ stock: sql`${products.stock} - ${item.quantity}` })
           .where(and(eq(products.id, item.productId), eq(products.status, "active"), sql`${products.stock} >= ${item.quantity}`));
-        if ((result as unknown as { affectedRows?: number }).affectedRows !== 1) {
+        const affectedRows = Array.isArray(result)
+          ? Number((result[0] as { affectedRows?: number } | undefined)?.affectedRows ?? 0)
+          : Number((result as unknown as { affectedRows?: number }).affectedRows ?? 0);
+        if (affectedRows !== 1) {
           throw new Error(`Estoque insuficiente para ${item.productName}`);
         }
       }

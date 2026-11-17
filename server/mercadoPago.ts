@@ -70,23 +70,24 @@ function validSignature(req: Request) {
 export function registerMercadoPagoRoutes(app: Express) {
   app.post("/api/mercadopago/webhook", async (req, res) => {
     if (!validSignature(req)) return res.status(401).json({ error: "Assinatura inválida" });
-    res.sendStatus(200);
     const token = accessToken();
     const orderId = String((req.body as { data?: { id?: string } })?.data?.id || req.query["data.id"] || "");
-    if (!token || !orderId) return;
+    if (!token || !orderId) return res.status(400).json({ error: "Notificação sem identificador do pedido" });
     try {
       const response = await fetch(`${MP_API}/v1/orders/${encodeURIComponent(orderId)}`, { headers: { authorization: `Bearer ${token}` } });
-      if (!response.ok) return;
+      if (!response.ok) return res.status(502).json({ error: "Não foi possível consultar o pedido no Mercado Pago" });
       const remote = await response.json() as { external_reference?: string; status?: string; status_detail?: string };
-      if (!remote.external_reference) return;
+      if (!remote.external_reference) return res.status(422).json({ error: "Pedido sem referência externa" });
       const local = await getOrderByCode(remote.external_reference);
-      if (!local) return;
+      if (!local) return res.status(404).json({ error: "Pedido local não encontrado" });
       const approved = remote.status === "processed" || remote.status_detail === "accredited";
       const rejected = remote.status === "cancelled" || remote.status === "failed";
       if (approved) await updateOrderStatus(local.id, { paymentStatus: "approved", orderStatus: "paid" });
       else if (rejected) await updateOrderStatus(local.id, { paymentStatus: "rejected", orderStatus: "cancelled" });
+      return res.sendStatus(200);
     } catch (error) {
       console.error("Mercado Pago webhook processing failed:", error instanceof Error ? error.message : error);
+      return res.status(500).json({ error: "Falha ao processar a notificação" });
     }
   });
 }
