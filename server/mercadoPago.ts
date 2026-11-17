@@ -27,7 +27,7 @@ export async function createMercadoPagoOrder(input: {
       accept: "application/json",
       "content-type": "application/json",
       authorization: `Bearer ${token}`,
-      "x-idempotency-key": crypto.randomUUID(),
+      "x-idempotency-key": `puxa-order-${input.code}`,
     },
     body: JSON.stringify({
       type: "online",
