@@ -670,16 +670,18 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
 .order-admin-actions button:disabled { opacity:.5; cursor:not-allowed; }
 
 .partner-row { flex-wrap:wrap; }
-.partner-link-actions { flex-basis:100%; display:flex; justify-content:flex-end; margin-top:4px; }
-.partner-link-actions button { display:inline-flex; align-items:center; gap:5px; border:1px solid #e7bfd0; border-radius:6px; background:#fff6f9; color:#9b0d46; padding:6px 9px; font:700 10px Inter,sans-serif; cursor:pointer; }
+.partner-link-actions { flex-basis:100%; display:flex; justify-content:flex-end; align-items:stretch; gap:6px; margin-top:8px; }
+.partner-link-actions button { display:inline-flex; align-items:center; justify-content:center; gap:5px; min-height:36px; min-width:108px; border:1px solid #e7bfd0; border-radius:6px; background:#fff6f9; color:#9b0d46; padding:7px 10px; font:700 10px/1.15 Inter,sans-serif; text-align:center; cursor:pointer; }
 .partner-link-actions button:hover { background:#ffe4ed; border-color:#d31a61; }
 .partner-link-actions button:disabled { opacity:.55; cursor:wait; }
+@media (max-width:560px) { .partner-link-actions { justify-content:stretch; } .partner-link-actions button { flex:1 1 0; min-width:0; } }
 
 .partner-row { flex-wrap:wrap; }
-.partner-link-actions { flex-basis:100%; display:flex; justify-content:flex-end; margin-top:4px; }
-.partner-link-actions button { display:inline-flex; align-items:center; gap:5px; border:1px solid #e7bfd0; border-radius:6px; background:#fff6f9; color:#9b0d46; padding:6px 9px; font:700 10px Inter,sans-serif; cursor:pointer; }
+.partner-link-actions { flex-basis:100%; display:flex; justify-content:flex-end; align-items:stretch; gap:6px; margin-top:8px; }
+.partner-link-actions button { display:inline-flex; align-items:center; justify-content:center; gap:5px; min-height:36px; min-width:108px; border:1px solid #e7bfd0; border-radius:6px; background:#fff6f9; color:#9b0d46; padding:7px 10px; font:700 10px/1.15 Inter,sans-serif; text-align:center; cursor:pointer; }
 .partner-link-actions button:hover { background:#ffe4ed; border-color:#d31a61; }
 .partner-link-actions button:disabled { opacity:.55; cursor:wait; }
+@media (max-width:560px) { .partner-link-actions { justify-content:stretch; } .partner-link-actions button { flex:1 1 0; min-width:0; } }
 
 /* Cards de catálogo: mesma proporção para fotos verticais, quadradas e horizontais. */
 .market-product-media { aspect-ratio: 1 / 1; overflow: hidden; }
