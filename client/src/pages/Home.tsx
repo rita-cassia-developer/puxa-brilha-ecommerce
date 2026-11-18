@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
+import { createClientId } from "@/const";
 
 const categoryLinks = ["Todas as categorias", "Cera de depilação", "Abaixador de língua", "Tiras de depilação", "Ofertas"];
 const categoryMap: Record<string, Product["category"] | "Todos"> = { "Cera de depilação": "Wax", "Abaixador de língua": "TongueDepressor", "Tiras de depilação": "DepilatoryStrips" };
@@ -188,7 +189,7 @@ export default function Home() {
     if (typeof window === "undefined") return "server-session";
     const existing = window.sessionStorage.getItem("puxa-brilha-referral-session");
     if (existing) return existing;
-    const created = `session-${crypto.randomUUID()}`;
+    const created = `session-${createClientId()}`;
     window.sessionStorage.setItem("puxa-brilha-referral-session", created);
     return created;
   })[0];
