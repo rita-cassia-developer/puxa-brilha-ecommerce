@@ -1,6 +1,16 @@
 import { OAUTH_STATE_COOKIE, encodeOAuthState } from "@shared/const";
 
 export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+export const createClientId = () => {
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+  return hex.replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, "$1-$2-$3-$4-$5");
+};
+
 
 // O acesso principal da loja usa e-mail/senha. O OAuth legado continua disponível
 // separadamente e suas sessões existentes permanecem aceitas pelo servidor.
@@ -26,7 +36,7 @@ export const startManusLogin = (returnPath = window.location.pathname) => {
   if (!oauthPortalUrl || !appId) throw new Error("Manus login is not configured");
   const redirectUri = `${window.location.origin}/api/oauth/callback`;
 
-  const nonce = crypto.randomUUID();
+  const nonce = createClientId();
   document.cookie = `${OAUTH_STATE_COOKIE}=${nonce}; Path=/; Max-Age=600; SameSite=None; Secure`;
   const safeReturnPath = returnPath.startsWith("/") && !returnPath.startsWith("//") ? returnPath : "/";
   const state = encodeOAuthState({ redirectUri, nonce, returnPath: safeReturnPath });
