@@ -1,160 +1,174 @@
 import { COOKIE_NAME } from "@shared/const";
-
 import { getSessionCookieOptions } from "./_core/cookies";
-
 import { systemRouter } from "./_core/systemRouter";
-
 import { adminProcedure, customerProcedure, publicProcedure, router, vendorProcedure } from "./_core/trpc";
-
 import { createManualVendor, createOrder, createProduct, deleteOrder, deleteProduct, ensureOwnReferralLink, ensureReferralLink, getOrderDetail, getVendorDashboard, listCommissions, listCustomerOrders, listLeads, listOrders, saveOrderCheckout, listProducts, listVendors, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
-
 import { z } from "zod";
-
 import { TRPCError } from "@trpc/server";
-
 import { createPartnerInvitation, revokeLocalSession, StoreAuthError } from "./storeAuth";
-
 import { createMercadoPagoOrder, createMercadoPagoPixOrder, getMercadoPagoPixPayment } from "./mercadoPago";
 
-
-
 const productInput = z.object({
-  
   name: z.string().trim().min(1).max(180),
-  
   category: z.string().trim().min(1).max(80),
-  
   description: z.string().trim().min(1),
-  
   price: z.coerce.number().min(0),
-  
   oldPrice: z.coerce.number().min(0).optional().nullable(),
-  
   badge: z.string().trim().max(80).optional().nullable(),
-  
   accent: z.enum(["olive", "clay", "sand", "rose", "ink"]).default("rose"),
-  
   note: z.string().trim().max(160).optional().nullable(),
-  
   stock: z.coerce.number().int().min(0),
-  
   weightGrams: z.coerce.number().int().min(0),
-  
   imageUrl: z.string().trim().max(500).refine(value => {
-    
     if (value.startsWith("/brand/")) {
-      
       return /^\/brand\/(?:[A-Za-z0-9_-][A-Za-z0-9._-]*\/)*[A-Za-z0-9_-][A-Za-z0-9._-]*$/.test(value);
-      
     }
-    
     try {
-      
       const url = new URL(value);
-      
       return url.protocol === "https:" && !url.username && !url.password;
-      
     } catch {
-      
       return false;
-      
     }
-    
   }, { message: "Use uma URL HTTPS ou um caminho local válido iniciado por /brand/." }).optional().nullable(),
-  
   status: z.enum(["draft", "active", "archived"]).default("active"),
-  
 });
 
-
-
 function slugify(value: string) {
-  
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-  
 }
 
-
-
 export const appRouter = router({
-  
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
-  
   system: systemRouter,
-  
   auth: router({
-    
     me: publicProcedure.query(opts => opts.ctx.user),
-    
     logout: publicProcedure.mutation(async ({ ctx }) => {
-      
       let revoked = true;
-      
       try { await revokeLocalSession(ctx.req); } catch { revoked = false; }
-      
       const cookieOptions = getSessionCookieOptions(ctx.req);
-      
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
-      
       if (!revoked) return { success: true, warning: "A sessão foi encerrada neste navegador, mas a revogação no servidor precisa ser verificada quando o banco voltar." } as const;
-      
-      return { success: true } as const;
-      
+      return {
+        success: true,
+      } as const;
     }),
-    
   }),
-  
+
   admin: router({
-    
-    session: adminProcedure.query(({ ctx }) => ({ id: ctx.user.id, name: ctx.user.name, email: ctx.user.email, role: ctx.user.role })),
-    
+    session: adminProcedure.query(({ ctx }) => ({
+      id: ctx.user.id,
+      name: ctx.user.name,
+      email: ctx.user.email,
+      role: ctx.user.role,
+    })),
   }),
-  
+
   products: router({
-    
     list: adminProcedure.input(z.object({ search: z.string().optional() }).optional()).query(({ input }) => listProducts(input?.search)),
-    
-    create: adminProcedure.input(productInput).mutation(({ input }) => createProduct({ ...input, slug: `${slugify
+    create: adminProcedure.input(productInput).mutation(({ input }) => createProduct({
+      ...input,
+      slug: `${slugify(input.name)}-${Date.now()}`,
+      price: input.price.toFixed(2),
+      oldPrice: input.oldPrice == null ? null : input.oldPrice.toFixed(2),
+      stock: input.stock,
+      weightGrams: input.weightGrams,
+    })),
+    update: adminProcedure.input(productInput.extend({ id: z.number().int().positive() })).mutation(({ input }) => {
+      const { id, ...values } = input;
+      return updateProduct(id, {
+        ...values,
+        price: values.price.toFixed(2),
+        oldPrice: values.oldPrice == null ? null : values.oldPrice.toFixed(2),
+      });
+    }),
+    remove: adminProcedure.input(z.object({ id: z.number().int().positive() })).mutation(({ input }) => deleteProduct(input.id)),
+  }),
 
+  catalog: router({
+    list: publicProcedure.query(() => listProducts(undefined, true)),
+  }),
 
+  orders: router({
+    create: publicProcedure.input(z.object({
+      items: z.array(z.object({ productId: z.coerce.number().int().positive(), quantity: z.coerce.number().int().positive() })).min(1),
+      customerName: z.string().trim().min(2).max(160),
+      customerEmail: z.string().email().max(320).optional(),
+      customerPhone: z.string().max(40).optional(),
+      address: z.record(z.string(), z.string()).optional(),
+      cep: z.string().optional(),
+      paymentMethod: z.enum(["pix", "card", "boleto", "link"]),
+      fulfillment: z.enum(["delivery", "pickup"]),
+      referralCode: z.string().trim().max(32).optional(),
+      checkoutRequestId: z.string().trim().min(16).max(80),
+    })).mutation(async ({ input, ctx }) => {
+      const created = await createOrder(input, ctx.user?.id);
+      const detail = await getOrderDetail(created.id);
+      let checkoutUrl: string | null = detail?.order.checkoutUrl ?? null;
+      let pixPayment: Awaited<ReturnType<typeof createMercadoPagoPixOrder>> = null;
+      if (detail) {
+        try {
+          if (detail.order.paymentMethod === "pix") {
+            pixPayment = detail.order.mercadoPagoOrderId ? await getMercadoPagoPixPayment(detail.order.mercadoPagoOrderId) : await createMercadoPagoPixOrder({ code: created.code, total: created.total, customerEmail: detail.order.customerEmail });
+            if (pixPayment?.orderId && !detail.order.mercadoPagoOrderId) await saveOrderCheckout(created.id, { mercadoPagoOrderId: pixPayment.orderId, checkoutUrl: pixPayment.ticketUrl ?? "" });
+          } else if (!checkoutUrl) {
+            const checkout = await createMercadoPagoOrder({ code: created.code, total: created.total, shipping: Number(detail.order.shipping), customerEmail: detail.order.customerEmail, items: detail.items });
+            checkoutUrl = checkout?.checkoutUrl ?? null;
+            if (checkout) await saveOrderCheckout(created.id, { mercadoPagoOrderId: checkout.id, checkoutUrl: checkout.checkoutUrl ?? "" });
+          }
+        } catch (error) {
+          await updateOrderStatus(created.id, { paymentStatus: "rejected", orderStatus: "cancelled" });
+          throw error;
+        }
+      }
+      return { ...created, checkoutUrl, pixPayment };
+    }),
+    list: adminProcedure.query(() => listOrders()),
+    detail: adminProcedure.input(z.object({ id: z.number().int().positive() })).query(({ input }) => getOrderDetail(input.id)),
+    updateStatus: adminProcedure.input(z.object({
+      id: z.number().int().positive(),
+      paymentStatus: z.enum(["pending", "approved", "rejected", "refunded"]).optional(),
+      orderStatus: z.enum(["pending", "paid", "processing", "shipped", "ready_pickup", "completed", "cancelled"]).optional(),
+    })).mutation(({ input }) => {
+      const { id, ...values } = input;
+      return updateOrderStatus(id, values);
+    }),
+    remove: adminProcedure.input(z.object({ id: z.number().int().positive() })).mutation(({ input }) => deleteOrder(input.id)),
+  }),
 
+  customer: router({
+    orders: customerProcedure.query(({ ctx }) => listCustomerOrders(ctx.user.id)),
+  }),
 
+  referrals: router({
+    visit: publicProcedure.input(z.object({
+      code: z.string().trim().min(3).max(32),
+      sessionId: z.string().trim().min(8).max(128),
+      productId: z.coerce.number().int().positive().optional(),
+      landingPath: z.string().max(500).optional(),
+      userAgent: z.string().max(500).optional(),
+    })).mutation(({ input }) => registerReferralVisit(input)),
+  }),
 
+  partners: router({
+    vendors: adminProcedure.query(() => listVendors()),
+    inviteAccess: adminProcedure.input(z.object({ vendorId: z.number().int().positive() }).strict()).mutation(async ({ input }) => {
+      try { return await createPartnerInvitation(input.vendorId); }
+      catch (error) { throw new TRPCError({ code: "BAD_REQUEST", message: error instanceof StoreAuthError ? error.message : "Não foi possível ativar o acesso. Confira as tabelas de login na hospedagem." }); }
+    }),
+    createVendor: adminProcedure.input(z.object({ displayName: z.string().trim().min(2).max(160), email: z.string().trim().email(), phone: z.string().max(40).optional(), partnerType: z.enum(["representative", "vendor", "distributor"]).default("vendor"), commissionValue: z.coerce.number().min(0).max(100) })).mutation(({ input }) => createManualVendor(input)),
+    generateLink: adminProcedure.input(z.object({ vendorId: z.number().int().positive() })).mutation(({ input }) => ensureReferralLink(input.vendorId)),
+    leads: adminProcedure.query(() => listLeads()),
+    commissions: adminProcedure.query(() => listCommissions()),
+    dashboard: vendorProcedure.query(({ ctx }) => getVendorDashboard(ctx.user.id)),
+    generateOwnLink: vendorProcedure.mutation(({ ctx }) => ensureOwnReferralLink(ctx.user.id)),
+  }),
 
+  // TODO: add feature routers here, e.g.
+  // todo: router({
+  //   list: protectedProcedure.query(({ ctx }) =>
+  //     db.getUserTodos(ctx.user.id)
+  //   ),
+  // }),
+});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export type AppRouter = typeof appRouter;
