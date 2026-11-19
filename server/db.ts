@@ -219,7 +219,11 @@ export async function saveOrderCheckout(id: number, input: { mercadoPagoOrderId:
 export async function listOrders() {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
-  return db.select().from(orders).orderBy(desc(orders.createdAt)).limit(100);
+  const rows = await db.select().from(orders).orderBy(desc(orders.createdAt)).limit(100);
+  return Promise.all(rows.map(async order => ({
+    ...order,
+    items: await db.select().from(orderItems).where(eq(orderItems.orderId, order.id)),
+  })));
 }
 
 export async function listCustomerOrders(userId: number) {
