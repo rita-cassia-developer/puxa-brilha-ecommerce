@@ -17,10 +17,18 @@ type PixPaymentData = { orderId: string | null; qrCode: string; qrCodeBase64: st
 export async function createMercadoPagoPixOrder(input: { code: string; total: number; customerEmail?: string | null }): Promise<PixPaymentData | null> {
   const token = accessToken();
   if (!token) return null;
-  const response = await fetch(MP_API + "/v1/orders", { method: "POST", headers: { accept: "application/json", "content-type": "application/json", authorization: "Bearer " + token, "x-idempotency-key": "puxa-pix-" + input.code }, body: JSON.stringify({ type: "online", processing_mode: "automatic", capture_mode: "automatic_async", total_amount: input.total.toFixed(2), external_reference: input.code, transactions: { payments: [{ amount: input.total.toFixed(2), payment_method: { id: "pix", type: "bank_transfer" } }] }, ...(input.customerEmail ? { payer: { email: input.customerEmail } } : {}) }) });
-  const data = await response.json().catch(() => ({})) as { id?: string; transactions?: { payments?: Array<{ payment_method?: { qr_code?: string; qr_code_base64?: string; ticket_url?: string } }> }; message?: string; error?: string };
-  const method = data.transactions?.payments?.[0]?.payment_method;
-  if (!response.ok || !method?.qr_code || !method.qr_code_base64) throw new Error(data.message || data.error || "Não foi possível gerar o Pix.");
+  const headers = { accept: "application/json", "content-type": "application/json", authorization: "Bearer " + token };
+  const response = await fetch(MP_API + "/v1/orders", { method: "POST", headers: { ...headers, "x-idempotency-key": "puxa-pix-" + input.code }, body: JSON.stringify({ type: "online", processing_mode: "automatic", total_amount: input.total.toFixed(2), external_reference: input.code, transactions: { payments: [{ amount: input.total.toFixed(2), payment_method: { id: "pix", type: "bank_transfer" } }] }, payer: { email: input.customerEmail } }) });
+  let data = await response.json().catch(() => ({})) as { id?: string; transactions?: { payments?: Array<{ payment_method?: { qr_code?: string; qr_code_base64?: string; ticket_url?: string } }> }; message?: string; error?: string; cause?: Array<{ code?: string; description?: string }> };
+  let method = data.transactions?.payments?.[0]?.payment_method;
+  for (let attempt = 0; response.ok && !method?.qr_code && data.id && attempt < 4; attempt++) {
+    await new Promise(resolve => setTimeout(resolve, 700));
+    const poll = await fetch(MP_API + "/v1/orders/" + encodeURIComponent(data.id), { headers });
+    data = await poll.json().catch(() => data) as typeof data;
+    method = data.transactions?.payments?.[0]?.payment_method;
+  }
+  const detail = data.cause?.map(item => item.description || item.code).filter(Boolean).join(" | ");
+  if (!response.ok || !method?.qr_code || !method.qr_code_base64) throw new Error(data.message || data.error || detail || "O Mercado Pago não disponibilizou o QR Code Pix. Verifique se a chave Pix está cadastrada na conta.");
   return { orderId: data.id ?? null, qrCode: method.qr_code, qrCodeBase64: method.qr_code_base64, ticketUrl: method.ticket_url ?? null };
 }
 
