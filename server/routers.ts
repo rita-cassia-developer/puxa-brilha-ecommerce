@@ -6,7 +6,7 @@ import { createManualVendor, createOrder, createProduct, deleteOrder, deleteProd
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createPartnerInvitation, revokeLocalSession, StoreAuthError } from "./storeAuth";
-import { createMercadoPagoOrder, createMercadoPagoPixOrder, getMercadoPagoPixPayment } from "./mercadoPago";
+import { createMercadoPagoOrder, createMercadoPagoPixOrder, getMercadoPagoPixPayment, syncMercadoPagoOrder } from "./mercadoPago";
 
 const productInput = z.object({
   name: z.string().trim().min(1).max(180),
@@ -122,7 +122,16 @@ export const appRouter = router({
       }
       return { ...created, checkoutUrl, pixPayment };
     }),
-    list: adminProcedure.query(() => listOrders()),
+    list: adminProcedure.query(async () => {
+      const current = await listOrders();
+      await Promise.all(current.filter(order => order.paymentStatus === "pending" && order.mercadoPagoOrderId).map(async order => {
+        try {
+          const status = await syncMercadoPagoOrder(order.mercadoPagoOrderId as string);
+          if (status.paymentStatus !== "pending") await updateOrderStatus(order.id, status);
+        } catch { /* uma falha de consulta não impede o painel de abrir */ }
+      }));
+      return listOrders();
+    }),
     detail: adminProcedure.input(z.object({ id: z.number().int().positive() })).query(({ input }) => getOrderDetail(input.id)),
     updateStatus: adminProcedure.input(z.object({
       id: z.number().int().positive(),
