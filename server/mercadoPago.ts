@@ -108,6 +108,18 @@ function validSignature(req: Request) {
   return v1.length === expected.length && crypto.timingSafeEqual(Buffer.from(v1), Buffer.from(expected));
 }
 
+export async function syncMercadoPagoOrder(orderId: string): Promise<{ paymentStatus: "pending" | "approved" | "rejected"; paymentMethod?: "pix" | "card" | "boleto" | "link" }> {
+  const token = accessToken();
+  if (!token) return { paymentStatus: "pending" };
+  const response = await fetch(MP_API + "/v1/orders/" + encodeURIComponent(orderId), { headers: { accept: "application/json", authorization: "Bearer " + token } });
+  if (!response.ok) return { paymentStatus: "pending" };
+  const remote = await response.json() as { status?: string; status_detail?: string; transactions?: { payments?: Array<{ payment_method?: { type?: string; id?: string }; payment_method_id?: string }> } };
+  const approved = remote.status === "processed" || remote.status_detail === "accredited";
+  const rejected = remote.status === "cancelled" || remote.status === "failed";
+  const paymentMethod = confirmedPaymentMethod(remote);
+  return { paymentStatus: approved ? "approved" : rejected ? "rejected" : "pending", ...(paymentMethod ? { paymentMethod } : {}) };
+}
+
 export function registerMercadoPagoRoutes(app: Express) {
   app.post("/api/mercadopago/webhook", async (req, res) => {
     if (!validSignature(req)) return res.status(401).json({ error: "Assinatura inválida" });
