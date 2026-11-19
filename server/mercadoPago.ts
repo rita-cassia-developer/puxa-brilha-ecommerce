@@ -12,6 +12,28 @@ function publicOrigin() {
   return (process.env.PUBLIC_APP_URL || "").trim().replace(/\/$/, "");
 }
 
+type PixPaymentData = { orderId: string | null; qrCode: string; qrCodeBase64: string; ticketUrl: string | null };
+
+export async function createMercadoPagoPixOrder(input: { code: string; total: number; customerEmail?: string | null }): Promise<PixPaymentData | null> {
+  const token = accessToken();
+  if (!token) return null;
+  const response = await fetch(MP_API + "/v1/orders", { method: "POST", headers: { accept: "application/json", "content-type": "application/json", authorization: "Bearer " + token, "x-idempotency-key": "puxa-pix-" + input.code }, body: JSON.stringify({ type: "online", processing_mode: "automatic", capture_mode: "automatic_async", total_amount: input.total.toFixed(2), external_reference: input.code, transactions: { payments: [{ amount: input.total.toFixed(2), payment_method: { id: "pix", type: "bank_transfer" } }] }, ...(input.customerEmail ? { payer: { email: input.customerEmail } } : {}) }) });
+  const data = await response.json().catch(() => ({})) as { id?: string; transactions?: { payments?: Array<{ payment_method?: { qr_code?: string; qr_code_base64?: string; ticket_url?: string } }> }; message?: string; error?: string };
+  const method = data.transactions?.payments?.[0]?.payment_method;
+  if (!response.ok || !method?.qr_code || !method.qr_code_base64) throw new Error(data.message || data.error || "Não foi possível gerar o Pix.");
+  return { orderId: data.id ?? null, qrCode: method.qr_code, qrCodeBase64: method.qr_code_base64, ticketUrl: method.ticket_url ?? null };
+}
+
+export async function getMercadoPagoPixPayment(orderId: string): Promise<PixPaymentData | null> {
+  const token = accessToken();
+  if (!token) return null;
+  const response = await fetch(MP_API + "/v1/orders/" + encodeURIComponent(orderId), { headers: { accept: "application/json", authorization: "Bearer " + token } });
+  const data = await response.json().catch(() => ({})) as { id?: string; transactions?: { payments?: Array<{ payment_method?: { qr_code?: string; qr_code_base64?: string; ticket_url?: string } }> } };
+  const method = data.transactions?.payments?.[0]?.payment_method;
+  if (!response.ok || !method?.qr_code || !method.qr_code_base64) return null;
+  return { orderId: data.id ?? orderId, qrCode: method.qr_code, qrCodeBase64: method.qr_code_base64, ticketUrl: method.ticket_url ?? null };
+}
+
 export async function createMercadoPagoOrder(input: {
   code: string;
   total: number;
