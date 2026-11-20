@@ -169,7 +169,20 @@ export default function Admin() {
     if (!window.confirm(`Marcar o pedido ${order.code} como cancelado?`)) return;
     updateOrderStatus.mutate({ id: order.id, orderStatus: "cancelled", paymentStatus: order.paymentStatus === "approved" ? "refunded" : "rejected" });
   };
-  const notifyOrderByWhatsApp = (order: (typeof orders)[number]) => {\n    if (order.paymentStatus !== "approved") return;\n    const phone = (order.customerPhone || "").replace(/\\D/g, "");\n    if (phone.length < 10) { toast.error("Este pedido não tem um WhatsApp válido."); return; }\n    let pickup: Record<string, string> = {};\n    try { pickup = order.addressJson ? JSON.parse(order.addressJson) : {}; } catch {}\n    const isPickup = order.fulfillment === "pickup";\n    if (isPickup && (!pickup.pickupLocation || !pickup.pickupDate || !pickup.pickupTime)) { toast.error("Salve primeiro o local, a data e o horário da retirada."); return; }\n    const question = isPickup ? \`Confirmar e avisar pelo WhatsApp o local da retirada do pedido \${order.code}?\` : \`Confirmar que o pedido \${order.code} foi postado e avisar o cliente pelo WhatsApp?\`;\n    if (!window.confirm(question)) return;\n    const number = phone.startsWith("55") ? phone : \`55\${phone}\`;\n    const text = isPickup\n      ? \`Olá, \${order.customerName}! Seu pedido \${order.code} da Puxa & Brilha foi confirmado para retirada. Local: \${pickup.pickupLocation}. Data: \${pickup.pickupDate}. Horário: \${pickup.pickupTime}. Leve um documento para retirar o pedido. Qualquer dúvida, estamos à disposição.\`\n      : \`Olá, \${order.customerName}! Seu pedido \${order.code} da Puxa & Brilha foi enviado. Em breve você receberá as informações de entrega. Qualquer dúvida, estamos à disposição.\`;\n    window.open(\`https://wa.me/\${number}?text=\${encodeURIComponent(text)}\`, "_blank", "noopener,noreferrer");\n    if (!isPickup) updateOrderStatus.mutate({ id: order.id, orderStatus: "shipped" });\n  };\n  const undoShipment = (order: (typeof orders)[number]) => {
+  const notifyOrderByWhatsApp = (order: (typeof orders)[number]) => {
+    if (order.paymentStatus !== "approved") return;
+    let pickup: Record<string, string> = {}; try { pickup = order.addressJson ? JSON.parse(order.addressJson) : {}; } catch {}
+    const isPickup = order.fulfillment === "pickup";
+    if (isPickup && (!pickup.pickupLocation || !pickup.pickupDate || !pickup.pickupTime)) { toast.error("Salve primeiro o local, a data e o horário da retirada."); return; }
+    const phone = (order.customerPhone || "").replace(/\D/g, "");
+    if (phone.length < 10) { toast.error("Este pedido não tem um WhatsApp válido."); return; }
+    if (!window.confirm(isPickup ? `Confirmar e avisar pelo WhatsApp o local da retirada do pedido ${order.code}?` : `Confirmar que o pedido ${order.code} foi postado e avisar o cliente pelo WhatsApp?`)) return;
+    const number = phone.startsWith("55") ? phone : `55${phone}`;
+    const text = isPickup ? `Olá, ${order.customerName}! Seu pedido ${order.code} da Puxa & Brilha foi confirmado para retirada. Local: ${pickup.pickupLocation}. Data: ${pickup.pickupDate}. Horário: ${pickup.pickupTime}. Leve um documento para retirar o pedido.` : `Olá, ${order.customerName}! Seu pedido ${order.code} da Puxa & Brilha foi enviado. Em breve você receberá as informações de entrega. Qualquer dúvida, estamos à disposição.`;
+    window.open(`https://wa.me/${number}?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+    if (!isPickup) updateOrderStatus.mutate({ id: order.id, orderStatus: "shipped" });
+  };
+  const undoShipment = (order: (typeof orders)[number]) => {
     if (!window.confirm(`Desfazer a marcação de enviado do pedido ${order.code}?`)) return;
     updateOrderStatus.mutate({ id: order.id, orderStatus: "processing" });
   };
