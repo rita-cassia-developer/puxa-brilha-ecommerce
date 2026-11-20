@@ -10,6 +10,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 
 const derive = promisify(scrypt);
 const SESSION_MS = 7 * 24 * 60 * 60 * 1000;
+const INACTIVITY_MS = 30 * 60 * 1000;
 export class StoreAuthError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }
@@ -39,12 +40,17 @@ export async function readLocalUser(req: Request): Promise<User | null> {
   const token = localSessionToken(req);
   if (!token || !/^pb_[A-Za-z0-9_-]{43}$/.test(token)) return null;
   const db = await database();
-  const rows = await db.select({ user: users }).from(storeSessions).innerJoin(users, eq(users.id, storeSessions.userId))
-    .where(and(eq(storeSessions.tokenHash, digestToken(token)), gt(storeSessions.expiresAt, new Date()))).limit(1);
+  const now = new Date();
+  const inactiveSince = new Date(now.getTime() - INACTIVITY_MS);
+  const rows = await db.select({ user: users, sessionId: storeSessions.id }).from(storeSessions).innerJoin(users, eq(users.id, storeSessions.userId))
+    .where(and(eq(storeSessions.tokenHash, digestToken(token)), gt(storeSessions.expiresAt, now), gt(storeSessions.lastActivityAt, inactiveSince))).limit(1);
   const user = rows[0]?.user;
   if (user?.role === "vendor") {
     const partner = await db.select({ status: vendors.status }).from(vendors).where(eq(vendors.userId, user.id)).limit(1);
     if (!partner[0] || partner[0].status !== "active") return null;
+  }
+  if (rows[0]?.sessionId) {
+    await db.update(storeSessions).set({ lastActivityAt: now }).where(eq(storeSessions.id, rows[0].sessionId));
   }
   return user ?? null;
 }
