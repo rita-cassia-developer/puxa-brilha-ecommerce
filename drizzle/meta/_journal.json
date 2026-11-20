@@ -36,6 +36,13 @@
       "when": 1794232000138,
       "tag": "0004_store_auth",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1794240000000,
+      "tag": "0006_customer_account_phone",
+      "breakpoints": true
     }
   ]
 }
