@@ -56,8 +56,8 @@ async function startServer() {
   server.listen(port, "0.0.0.0", () => console.log(`Server listening on port ${port}`));
   const expirePendingOrders = async () => {
     try {
-      const cancelled = await cancelExpiredPendingOrders(48);
-      if (cancelled > 0) console.log(`[Orders] ${cancelled} pedido(s) pendente(s) cancelado(s) após 48 horas`);
+      const cancelled = await cancelExpiredPendingOrders(24);
+      if (cancelled > 0) console.log(`[Orders] ${cancelled} pedido(s) pendente(s) cancelado(s) após 24 horas por falta de pagamento`);
     } catch (error) {
       console.error("[Orders] Falha ao expirar pedidos pendentes:", error instanceof Error ? error.message : error);
     }

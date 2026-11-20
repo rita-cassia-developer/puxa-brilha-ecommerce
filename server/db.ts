@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, isNull, like, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, like, lt, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, commissions, leads, orderItems, orders, products, referralLinks, referralVisits, users, vendors } from "../drizzle/schema";
 import { ENV } from "./_core/env";
@@ -216,6 +216,24 @@ export async function saveOrderCheckout(id: number, input: { mercadoPagoOrderId:
   if (!db) throw new Error("Database is not available");
   await db.update(orders).set({ mercadoPagoOrderId: input.mercadoPagoOrderId, checkoutUrl: input.checkoutUrl }).where(eq(orders.id, id));
 }
+export async function cancelExpiredPendingOrders(hours = 24) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
+  const expired = await db.select({ id: orders.id }).from(orders).where(and(
+    eq(orders.paymentStatus, "pending"),
+    eq(orders.orderStatus, "pending"),
+    lt(orders.createdAt, cutoff),
+  ));
+  if (!expired.length) return 0;
+  await db.update(orders).set({
+    paymentStatus: "rejected",
+    orderStatus: "cancelled",
+    cancellationReason: "cancelled_unpaid",
+  }).where(inArray(orders.id, expired.map(order => order.id)));
+  return expired.length;
+}
+
 export async function listOrders() {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
@@ -268,7 +286,7 @@ export async function getOrderByCode(code: string) {
   return rows[0] ?? null;
 }
 
-export async function updateOrderStatus(id: number, input: { paymentMethod?: "pix" | "card" | "boleto" | "link"; paymentStatus?: "pending" | "approved" | "rejected" | "refunded"; orderStatus?: "pending" | "paid" | "processing" | "shipped" | "ready_pickup" | "completed" | "cancelled"; addressJson?: string }) {
+export async function updateOrderStatus(id: number, input: { paymentMethod?: "pix" | "card" | "boleto" | "link"; paymentStatus?: "pending" | "approved" | "rejected" | "refunded"; orderStatus?: "pending" | "paid" | "processing" | "shipped" | "ready_pickup" | "completed" | "cancelled"; addressJson?: string; cancellationReason?: string | null }) {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
   const rows = await db.select().from(orders).where(eq(orders.id, id)).limit(1);

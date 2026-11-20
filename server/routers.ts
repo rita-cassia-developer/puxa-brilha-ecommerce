@@ -138,6 +138,7 @@ export const appRouter = router({
       paymentStatus: z.enum(["pending", "approved", "rejected", "refunded"]).optional(),
       orderStatus: z.enum(["pending", "paid", "processing", "shipped", "ready_pickup", "completed", "cancelled"]).optional(),
       addressJson: z.string().max(4000).optional(),
+      cancellationReason: z.enum(["cancelled_unpaid", "cancelled_manual"]).nullable().optional(),
     })).mutation(({ input }) => {
       const { id, ...values } = input;
       return updateOrderStatus(id, values);
