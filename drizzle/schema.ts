@@ -100,6 +100,7 @@ export const orders = mysqlTable("orders", {
   checkoutRequestId: varchar("checkoutRequestId", { length: 80 }).unique(),
   mercadoPagoOrderId: varchar("mercadoPagoOrderId", { length: 100 }).unique(),
   checkoutUrl: varchar("checkoutUrl", { length: 1000 }),
+  cancellationReason: varchar("cancellationReason", { length: 80 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, table => ({ vendorIdx: index("orders_vendor_idx").on(table.vendorId), paymentIdx: index("orders_payment_idx").on(table.paymentStatus), createdIdx: index("orders_created_idx").on(table.createdAt) }));
