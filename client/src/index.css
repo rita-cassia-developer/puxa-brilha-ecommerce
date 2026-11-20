@@ -476,6 +476,9 @@ body, .marketplace { background: var(--label-paper) !important; }
 .admin-orders-section { margin-top: 28px; }
 .orders-live-status { display: inline-flex; align-items: center; gap: 7px; color: #668e5a; font-size: 11px; font-weight: 700; }
 .orders-live-status span, .order-status span { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #668e5a; }
+.order-status-approved span { background: #668e5a; }
+.order-status-pending span { background: #d89b2b; }
+.order-status-danger span { background: #c94f58; }
 .admin-orders-list { overflow: hidden; border: 1px solid rgba(181,138,82,.25); background: #fffaf7; }
 .admin-order-row { display: grid; grid-template-columns: minmax(180px, 1.5fr) repeat(3, minmax(90px, .7fr)) minmax(130px, auto); align-items: center; gap: 20px; padding: 18px 20px; border-bottom: 1px solid rgba(181,138,82,.18); }
 .admin-order-row:last-child { border-bottom: 0; }
