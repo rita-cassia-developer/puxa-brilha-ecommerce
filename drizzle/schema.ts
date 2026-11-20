@@ -145,5 +145,6 @@ export const storeSessions = mysqlTable("store_sessions", {
   userId: int("userId").notNull().references(() => users.id),
   tokenHash: varchar("tokenHash", { length: 64 }).notNull().unique(),
   expiresAt: timestamp("expiresAt").notNull(),
+  lastActivityAt: timestamp("lastActivityAt").defaultNow().notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, table => ({ userIdx: index("store_sessions_user_idx").on(table.userId), expiresIdx: index("store_sessions_expiry_idx").on(table.expiresAt) }));
+}, table => ({ userIdx: index("store_sessions_user_idx").on(table.userId), expiresIdx: index("store_sessions_expiry_idx").on(table.expiresAt), activityIdx: index("store_sessions_activity_idx").on(table.lastActivityAt) }));
