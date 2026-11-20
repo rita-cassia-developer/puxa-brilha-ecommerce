@@ -1,9 +1,9 @@
 import { createHash, randomBytes, randomUUID, scrypt, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
-import { and, eq, gt, sql } from "drizzle-orm";
+import { and, eq, gt, inArray, sql } from "drizzle-orm";
 import { parse as parseCookies } from "cookie";
 import type { Request, Response } from "express";
-import { storeCredentials, storeSessions, users, vendors, type User } from "../drizzle/schema";
+import { orders, storeCredentials, storeSessions, users, vendors, type User } from "../drizzle/schema";
 import { getDb } from "./db";
 import { COOKIE_NAME } from "../shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
@@ -14,6 +14,7 @@ export class StoreAuthError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }
 export const normalizeEmail = (email: string) => email.trim().toLowerCase();
+export const normalizePhone = (phone: string) => phone.replace(/\D/g, "");
 export const digestToken = (token: string) => createHash("sha256").update(token).digest("hex");
 export async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
@@ -108,20 +109,36 @@ export async function signInStore(email: string, password: string, req: Request,
   await db.update(storeCredentials).set({ failedAttempts: 0, lockedUntil: null }).where(eq(storeCredentials.id, row.credential.id));
   return issueSession(row.user, req, res);
 }
-export async function registerStoreCustomer(name: string, email: string, password: string, req: Request, res: Response) {
+export async function registerStoreCustomer(name: string, email: string, phone: string, password: string, req: Request, res: Response) {
   const db = await database();
   const normalized = normalizeEmail(email);
+  const normalizedPhone = normalizePhone(phone);
+  if (normalizedPhone.length < 10) throw new StoreAuthError(400, "Informe um WhatsApp válido para vincular seus pedidos.");
   const passwordHash = await hashPassword(password);
   const user = await db.transaction(async tx => {
     const existing = await tx.select({ id: users.id }).from(users).where(sql`LOWER(TRIM(${users.email})) = ${normalized}`).limit(1);
     if (existing[0]) throw new StoreAuthError(409, "Não foi possível cadastrar esse e-mail. Entre com sua conta ou peça à loja a ativação do acesso existente.");
-    const inserted = await tx.insert(users).values({ openId: `local_${randomUUID()}`, name: name.trim(), email: normalized, role: "user", loginMethod: "store-password" });
+    const inserted = await tx.insert(users).values({ openId: `local_${randomUUID()}`, name: name.trim(), email: normalized, phone: normalizedPhone, role: "user", loginMethod: "store-password" });
     const userId = Number(inserted[0].insertId);
     await tx.insert(storeCredentials).values({ userId, email: normalized, passwordHash });
     const rows = await tx.select().from(users).where(eq(users.id, userId)).limit(1);
     return rows[0];
   });
-  return issueSession(user, req, res);
+  let linkedOrders = 0;
+  try { linkedOrders = await linkGuestOrders(user.id, normalized, normalizedPhone); } catch { /* A conta continua válida mesmo se o vínculo for tentado novamente no painel do cliente. */ }
+  return { ...(await issueSession(user, req, res)), linkedOrders };
+}
+export async function linkGuestOrders(userId: number, email: string, phone: string) {
+  const db = await database();
+  const normalizedEmail = normalizeEmail(email);
+  const normalizedPhone = normalizePhone(phone);
+  if (normalizedPhone.length < 10) throw new StoreAuthError(400, "Informe um WhatsApp válido.");
+  const candidates = await db.select({ id: orders.id, customerPhone: orders.customerPhone })
+    .from(orders)
+    .where(sql`LOWER(TRIM(${orders.customerEmail})) = ${normalizedEmail} AND ${orders.customerUserId} IS NULL`);
+  const ids = candidates.filter(order => normalizePhone(order.customerPhone ?? "") === normalizedPhone).map(order => order.id);
+  if (ids.length) await db.update(orders).set({ customerUserId: userId }).where(inArray(orders.id, ids));
+  return ids.length;
 }
 export async function createPartnerInvitation(vendorId: number) {
   const db = await database();

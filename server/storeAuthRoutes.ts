@@ -8,7 +8,7 @@ import { StoreAuthError, activateStoreAccount, isSameOrigin, limitAuthAttempt, l
 const email = z.string().trim().email().max(320);
 const password = z.string().min(10, "Use uma senha com pelo menos 10 caracteres.").max(128, "A senha deve ter até 128 caracteres.");
 const loginInput = z.object({ email, password: z.string().min(1).max(128) }).strict();
-const registerInput = z.object({ name: z.string().trim().min(2).max(160), email, password }).strict();
+const registerInput = z.object({ name: z.string().trim().min(2).max(160), email, phone: z.string().trim().min(10).max(40), password }).strict();
 const activateInput = z.object({ token: z.string().regex(/^[A-Za-z0-9_-]{43}$/), password }).strict();
 
 export function localMutationOriginGuard(req: Request, res: Response, next: () => void) {
@@ -48,7 +48,7 @@ export function registerStoreAuthRoutes(app: Express) {
       requireSameOrigin(req);
       const input = registerInput.parse(req.body);
       limitAuthAttempt(req, input.email);
-      res.status(201).json(await registerStoreCustomer(input.name, input.email, input.password, req, res));
+      res.status(201).json(await registerStoreCustomer(input.name, input.email, input.phone, input.password, req, res));
     } catch (error) { handleError(error, res); }
   });
   app.post("/api/store-auth/activate", async (req, res) => {

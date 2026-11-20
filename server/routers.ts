@@ -2,7 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, customerProcedure, publicProcedure, router, vendorProcedure } from "./_core/trpc";
-import { createManualVendor, createOrder, createProduct, deleteOrder, deleteProduct, ensureOwnReferralLink, ensureReferralLink, getOrderDetail, getVendorDashboard, listCommissions, listCustomerOrders, listLeads, listOrders, saveOrderCheckout, listProducts, listVendors, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
+import { createManualVendor, createOrder, createProduct, deleteOrder, deleteProduct, ensureOwnReferralLink, ensureReferralLink, linkGuestOrders, getOrderDetail, getVendorDashboard, listCommissions, listCustomerOrders, listLeads, listOrders, saveOrderCheckout, listProducts, listVendors, registerReferralVisit, updateOrderStatus, updateProduct } from "./db";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { createPartnerInvitation, revokeLocalSession, StoreAuthError } from "./storeAuth";
@@ -147,6 +147,7 @@ export const appRouter = router({
 
   customer: router({
     orders: customerProcedure.query(({ ctx }) => listCustomerOrders(ctx.user.id)),
+    linkOrders: customerProcedure.input(z.object({ phone: z.string().trim().min(10).max(40) }).strict()).mutation(({ ctx, input }) => linkGuestOrders(ctx.user.id, ctx.user.email ?? "", input.phone)),
   }),
 
   referrals: router({

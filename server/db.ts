@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, like, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, like, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, commissions, leads, orderItems, orders, products, referralLinks, referralVisits, users, vendors } from "../drizzle/schema";
 import { ENV } from "./_core/env";
@@ -226,6 +226,19 @@ export async function listOrders() {
   })));
 }
 
+export async function linkGuestOrders(userId: number, email: string, phone: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not available");
+  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedPhone = phone.replace(/\D/g, "");
+  if (normalizedPhone.length < 10) throw new Error("Informe um WhatsApp válido.");
+  const candidates = await db.select({ id: orders.id, customerPhone: orders.customerPhone })
+    .from(orders)
+    .where(and(isNull(orders.customerUserId), sql`LOWER(TRIM(${orders.customerEmail})) = ${normalizedEmail}`));
+  const ids = candidates.filter(order => (order.customerPhone ?? "").replace(/\D/g, "") === normalizedPhone).map(order => order.id);
+  if (ids.length) await db.update(orders).set({ customerUserId: userId }).where(inArray(orders.id, ids));
+  return ids.length;
+}
 export async function listCustomerOrders(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
