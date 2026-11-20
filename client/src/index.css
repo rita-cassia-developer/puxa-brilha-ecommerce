@@ -965,3 +965,46 @@ h1, h2, h3, h4, h5, h6 { font-weight: 800; letter-spacing: -0.035em; }
 .order-items-summary span { display: block; font-weight: 800; }
 
 .customer-link-orders{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:18px 0;padding:16px 18px;border:1px solid #efd5dc;background:#fff8fa}.customer-link-orders strong,.customer-link-orders small{display:block}.customer-link-orders small{margin-top:5px;color:#8e6c7b;font-size:11px}.customer-link-orders form{display:flex;gap:8px;align-items:center}.customer-link-orders input{min-height:40px;padding:8px 10px;border:1px solid #d7b7c2;border-radius:4px}.customer-link-orders button{white-space:nowrap}@media(max-width:700px){.customer-link-orders{display:block}.customer-link-orders form{margin-top:12px;flex-wrap:wrap}.customer-link-orders input{width:100%}}
+
+/* Navegação das áreas internas: ações de retorno e saída com contraste consistente. */
+.customer-header .admin-breadcrumb,
+.vendor-header .admin-breadcrumb,
+.legal-header .legal-back,
+.admin-header .admin-breadcrumb button,
+.customer-header .button,
+.vendor-header .button,
+.vendor-header > button,
+.admin-header-actions .button,
+.checkout-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 9px 15px;
+  border: 1px solid #e6b8c5;
+  border-radius: 6px;
+  background: #fff7f9;
+  color: #76283d;
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+.customer-header .admin-breadcrumb:hover,
+.vendor-header .admin-breadcrumb:hover,
+.legal-header .legal-back:hover,
+.admin-header .admin-breadcrumb button:hover,
+.customer-header .button:hover,
+.vendor-header .button:hover,
+.vendor-header > button:hover,
+.admin-header-actions .button:hover,
+.checkout-back:hover {
+  border-color: #76283d;
+  background: #76283d;
+  color: #fff;
+  box-shadow: 0 5px 14px rgba(118, 40, 61, .16);
+  transform: translateY(-1px);
+}
+.customer-header .admin-breadcrumb, .vendor-header .admin-breadcrumb, .legal-header .legal-back { color: #76283d; }
