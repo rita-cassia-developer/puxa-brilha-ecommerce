@@ -92,8 +92,8 @@ export const appRouter = router({
     create: publicProcedure.input(z.object({
       items: z.array(z.object({ productId: z.coerce.number().int().positive(), quantity: z.coerce.number().int().positive() })).min(1),
       customerName: z.string().trim().min(2).max(160),
-      customerEmail: z.string().email().max(320).optional(),
-      customerPhone: z.string().max(40).optional(),
+      customerEmail: z.string().trim().email().max(320),
+      customerPhone: z.string().trim().min(10).max(40),
       address: z.record(z.string(), z.string()).optional(),
       cep: z.string().optional(),
       paymentMethod: z.enum(["pix", "card", "boleto", "link"]),
@@ -137,6 +137,7 @@ export const appRouter = router({
       id: z.number().int().positive(),
       paymentStatus: z.enum(["pending", "approved", "rejected", "refunded"]).optional(),
       orderStatus: z.enum(["pending", "paid", "processing", "shipped", "ready_pickup", "completed", "cancelled"]).optional(),
+      addressJson: z.string().max(4000).optional(),
     })).mutation(({ input }) => {
       const { id, ...values } = input;
       return updateOrderStatus(id, values);
