@@ -104,7 +104,7 @@ export default function Admin() {
   const invitePartnerAccess = trpc.partners.inviteAccess.useMutation({
     onSuccess: result => {
       const url = new URL("/cliente", window.location.origin);
-      url.searchParams.set("convite", result.token);
+      url.searchParams.set("convite", result.token); 
       setAccessInvitation(url.toString());
     },
     onError: error => toast.error(error.message),
