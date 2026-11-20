@@ -255,7 +255,7 @@ export async function getOrderByCode(code: string) {
   return rows[0] ?? null;
 }
 
-export async function updateOrderStatus(id: number, input: { paymentMethod?: "pix" | "card" | "boleto" | "link"; paymentStatus?: "pending" | "approved" | "rejected" | "refunded"; orderStatus?: "pending" | "paid" | "processing" | "shipped" | "ready_pickup" | "completed" | "cancelled" }) {
+export async function updateOrderStatus(id: number, input: { paymentMethod?: "pix" | "card" | "boleto" | "link"; paymentStatus?: "pending" | "approved" | "rejected" | "refunded"; orderStatus?: "pending" | "paid" | "processing" | "shipped" | "ready_pickup" | "completed" | "cancelled"; addressJson?: string }) {
   const db = await getDb();
   if (!db) throw new Error("Database is not available");
   const rows = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
